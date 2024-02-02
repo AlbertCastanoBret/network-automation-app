@@ -1,0 +1,10 @@
+- id: 1
+  ip_address:
+  name: CSR-1000v
+  os: ios
+  transport: napalm
+  hostname: quokka.com
+  password: albert
+  ssh_port: 22
+  username: albert
+  vendor: cisco
