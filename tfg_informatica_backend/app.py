@@ -1,9 +1,18 @@
+import socket
 import threading
+from ipaddress import ip_network
+
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
+from napalm import get_network_driver
+from netmiko import ConnectHandler
+from scapy.layers.inet import ICMP, IP
+from scapy.layers.l2 import ARP, Ether
+
 from api import device_bp
 from flask_cors import CORS
 import asyncio
+import scapy.all as s
 
 
 app = Flask(__name__)
@@ -21,6 +30,7 @@ def run_flask_app():
 async def run_async_tasks():
     from services.AsyncTaskManager import AsyncTaskManager
     task_manager = AsyncTaskManager()
+    loop = asyncio.get_event_loop()
     try:
         await asyncio.gather(
             task_manager.monitor_device(10),
@@ -48,18 +58,16 @@ if __name__ == "__main__":
 
 # cisco_device = {
 #    'device_type': 'cisco_xe',
-#    'host': '192.168.0.58',
+#    'host': '192.168.0.61',
 #    'username': 'albert',
 #    'password': 'albert',
 #    'port': '22'
 # }
-#
-#
 # net_connect = ConnectHandler(**cisco_device)
-# output = net_connect.send_command("show version")
+# output = net_connect.send_command("sh access-list")
 # print("Answer from router: " + output)
 # net_connect.disconnect()
-
+#
 # so = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 # so.connect(("8.8.8.8", 80))
 # my_ip_addr = so.getsockname()[0]
@@ -70,7 +78,7 @@ if __name__ == "__main__":
 
 # devices = [
 #     {
-#         'hostname': '192.168.0.58',
+#         'hostname': '192.168.0.61',
 #         'device_type': 'ios',
 #         'username': 'albert',
 #         'password': 'albert'
@@ -99,7 +107,7 @@ if __name__ == "__main__":
 #     print(device)
 #
 #
-# target_ip = "192.168.0.58"
+# target_ip = "192.168.0.61"
 # arp_request = ARP(pdst=target_ip)
 # broadcast = Ether(dst="ff:ff:ff:ff:ff:ff")
 # arp_request_broadcast = broadcast / arp_request
