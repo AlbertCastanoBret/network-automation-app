@@ -10,7 +10,7 @@ class Device(db.Model):
     name = db.Column(db.String(50), nullable=False)
     os = db.Column(db.String(50), nullable=False)
     transport = db.Column(db.String(50), nullable=False)
-    hostname = db.Column(db.String(100), nullable=False)
+    domain_name = db.Column(db.String(100), nullable=False)
     password = db.Column(db.String(100), nullable=False)
     ssh_port = db.Column(db.Integer, default=22)
     username = db.Column(db.String(50), nullable=False)

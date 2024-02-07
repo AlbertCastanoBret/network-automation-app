@@ -3,7 +3,7 @@
   name: CSR-1000v
   os: ios
   transport: napalm
-  hostname: albertquokka.com
+  domain_name: albertquokka.com
   password: albert
   ssh_port: 22
   username: albert

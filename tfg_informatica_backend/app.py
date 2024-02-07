@@ -14,7 +14,6 @@ from flask_cors import CORS
 import asyncio
 import scapy.all as s
 
-
 app = Flask(__name__)
 CORS(app)
 app.register_blueprint(device_bp, url_prefix='/devices')
@@ -30,7 +29,6 @@ def run_flask_app():
 async def run_async_tasks():
     from services.AsyncTaskManager import AsyncTaskManager
     task_manager = AsyncTaskManager()
-    loop = asyncio.get_event_loop()
     try:
         await asyncio.gather(
             task_manager.monitor_device(10),
@@ -42,19 +40,53 @@ async def run_async_tasks():
         print("Tasks manually interrupted.")
 
 
-def main():
-    from services.DeviceManager import import_devices_from_file
-    with app.app_context():
-        db.create_all()
-        import_devices_from_file(filename="devices", filetype="yaml")
+from services.DeviceManager import import_devices_from_file
+with app.app_context():
+    db.create_all()
+    import_devices_from_file(filename="devices", filetype="yaml")
 
-    flask_thread = threading.Thread(target=run_flask_app)
-    flask_thread.start()
-    asyncio.run(run_async_tasks())
+flask_thread = threading.Thread(target=lambda: asyncio.run(run_async_tasks()))
+flask_thread.start()
 
 
-if __name__ == "__main__":
-    main()
+def find_ip_from_mac(mac, timeout=5):
+    ip_range = "192.168.0.0/24"
+
+    arp_request = Ether(dst="ff:ff:ff:ff:ff:ff") / ARP(pdst=ip_range)
+
+    ans, _ = s.srp(arp_request, timeout=timeout, iface_hint=ip_range, verbose=False)
+
+    for sent, received in ans:
+        if received.hwsrc == mac:
+            return received.psrc
+
+    return None
+
+
+target_mac = "98:EE:CB:E0:8F:54"
+ip_address = find_ip_from_mac(target_mac)
+
+if ip_address:
+    print(f"La dirección IP del dispositivo con MAC {target_mac} es {ip_address}")
+else:
+    print("Dispositivo no encontrado.")
+
+
+# def obtener_mac(ip):
+#     arp_request = ARP(pdst=ip)
+#     ether = Ether(dst="ff:ff:ff:ff:ff:ff")
+#     packet = ether / arp_request
+#     result = s.srp(packet, timeout=3, verbose=False)[0]
+#     mac = result[0][1].hwsrc
+#     return mac
+#
+#
+# # Ejemplo de uso
+# ip = "192.168.0.57"  # Coloca la dirección IP que deseas investigar
+# mac = obtener_mac(ip)
+# print(f"La dirección MAC asociada a la IP {ip} es: {mac}")
+
+
 
 # cisco_device = {
 #    'device_type': 'cisco_xe',
@@ -107,7 +139,7 @@ if __name__ == "__main__":
 #     print(device)
 #
 #
-# target_ip = "192.168.0.61"
+target_ip = "192.168.0.57"
 # arp_request = ARP(pdst=target_ip)
 # broadcast = Ether(dst="ff:ff:ff:ff:ff:ff")
 # arp_request_broadcast = broadcast / arp_request
@@ -117,12 +149,13 @@ if __name__ == "__main__":
 #         print(f"IP: {received.psrc}, MAC: {received.hwsrc}")
 # else:
 #     print(f"Device not founded. IP: {target_ip}")
-# icmp_request = IP(dst=target_ip) / ICMP()
-# response = s.sr1(icmp_request, timeout=2, verbose=False)
-# if response:
-#     print(f"IP: {response.src}, ICMP: {response.summary()}")
-# else:
-#     print(f"Device not founded. IP: {target_ip}")
+
+icmp_request = IP(dst=target_ip) / ICMP()
+response = s.sr1(icmp_request, timeout=2, verbose=False)
+if response:
+    print(f"IP: {response.src}, ICMP: {response.summary()}")
+else:
+    print(f"Device not founded. IP: {target_ip}")
 
 # def found_devices(ip_range):
 #     arp_packet = ARP(pdst=ip_range)

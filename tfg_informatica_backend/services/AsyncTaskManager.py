@@ -11,9 +11,9 @@ class AsyncTaskManager:
             with app.app_context():
                 devices = get_all_devices()
 
-            for device in devices:
-                print(socket.gethostbyname('albertquokka.com'))
-                print(socket.getaddrinfo('192.168.0.66', 22))
+            # for device in devices:
+            #     print(socket.gethostbyname('albertquokka.com'))
+            #     print(socket.getaddrinfo('192.168.0.66', 22))
 
             print("Monitoring devices...")
             await asyncio.sleep(device_monitor_interval)
