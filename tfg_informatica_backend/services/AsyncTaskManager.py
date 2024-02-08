@@ -19,13 +19,15 @@ class AsyncTaskManager:
                     with driver(device.ip_address, device.username, device.password) as device_conn:
                         facts = device_conn.get_facts()
                         environment = device_conn.get_environment()
+                        used_cpu = round(sum(cpu_info["%usage"] for cpu_info in environment['cpu'].values()) / len(
+                            environment['cpu']), 2)
                         used_ram_mb = round(environment['memory']['used_ram'] / (1024 ** 2), 2)
 
                         with app.app_context():
                             device_db = Device.query.filter_by(id=device.id).first()
                             device_db.current_status = True
                             device_db.os_version = facts['os_version']
-                            device_db.cpu = round(sum(cpu_info["%usage"] for cpu_info in environment['cpu'].values()) / len(environment['cpu']), 2)
+                            device_db.cpu = used_cpu
                             device_db.memory = used_ram_mb
                             db.session.commit()
                 except Exception as e:
