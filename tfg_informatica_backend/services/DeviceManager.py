@@ -22,11 +22,12 @@ def import_devices_from_file(filename, filetype):
 
 
 def get_device_by_id(device_id):
-    return Device.query.filter_by(id=device_id).first()
+    return Device.query.get(device_id)
 
 
 def get_all_devices():
-    devices = Device.query.all()
+    with app.app_context():
+        devices = Device.query.all()
     return devices
 
 

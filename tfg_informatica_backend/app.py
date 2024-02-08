@@ -3,23 +3,28 @@ import threading
 from ipaddress import ip_network
 
 from flask import Flask
-from flask_sqlalchemy import SQLAlchemy
 from napalm import get_network_driver
 from netmiko import ConnectHandler
 from scapy.layers.inet import ICMP, IP
 from scapy.layers.l2 import ARP, Ether
+from scapy.sendrecv import srp
 
-from api import device_bp
 from flask_cors import CORS
 import asyncio
 import scapy.all as s
 
 app = Flask(__name__)
 CORS(app)
-app.register_blueprint(device_bp, url_prefix='/devices')
+
+from flask_sqlalchemy import SQLAlchemy
+
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///database.db'
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 db = SQLAlchemy(app)
+
+from api import device_bp
+
+app.register_blueprint(device_bp, url_prefix='/devices')
 
 
 def run_flask_app():
@@ -31,7 +36,7 @@ async def run_async_tasks():
     task_manager = AsyncTaskManager()
     try:
         await asyncio.gather(
-            task_manager.monitor_device(10),
+            task_manager.monitor_devices(10),
             task_manager.monitor_services(20),
         )
     except asyncio.CancelledError:
@@ -49,44 +54,25 @@ flask_thread = threading.Thread(target=lambda: asyncio.run(run_async_tasks()))
 flask_thread.start()
 
 
-def find_ip_from_mac(mac, timeout=5):
-    ip_range = "192.168.0.0/24"
+@app.route('/')
+def a():
+    return "Hello world"
 
-    arp_request = Ether(dst="ff:ff:ff:ff:ff:ff") / ARP(pdst=ip_range)
-
-    ans, _ = s.srp(arp_request, timeout=timeout, iface_hint=ip_range, verbose=False)
-
-    for sent, received in ans:
-        if received.hwsrc == mac:
-            return received.psrc
-
-    return None
-
-
-target_mac = "98:EE:CB:E0:8F:54"
-ip_address = find_ip_from_mac(target_mac)
-
-if ip_address:
-    print(f"La dirección IP del dispositivo con MAC {target_mac} es {ip_address}")
-else:
-    print("Dispositivo no encontrado.")
-
-
-# def obtener_mac(ip):
-#     arp_request = ARP(pdst=ip)
-#     ether = Ether(dst="ff:ff:ff:ff:ff:ff")
-#     packet = ether / arp_request
-#     result = s.srp(packet, timeout=3, verbose=False)[0]
-#     mac = result[0][1].hwsrc
-#     return mac
+# def find_ip_from_mac(mac_address):
+#     devices = s.arping("192.168.0.0/24", verbose=False)[0]
+#
+#     for packet in devices:
+#         if packet[1].src == mac_address:
+#             return packet[1].psrc
+#     return None
 #
 #
-# # Ejemplo de uso
-# ip = "192.168.0.57"  # Coloca la dirección IP que deseas investigar
-# mac = obtener_mac(ip)
-# print(f"La dirección MAC asociada a la IP {ip} es: {mac}")
-
-
+# mac_address_to_find = "34:cf:f6:11:21:af"
+# ip_address = find_ip_from_mac(mac_address_to_find)
+# if ip_address:
+#     print(f"La dirección IP asociada a la MAC {mac_address_to_find} es {ip_address}")
+# else:
+#     print(f"No se encontró ninguna IP asociada a la MAC {mac_address_to_find}")
 
 # cisco_device = {
 #    'device_type': 'cisco_xe',
@@ -139,7 +125,7 @@ else:
 #     print(device)
 #
 #
-target_ip = "192.168.0.57"
+# target_ip = "192.168.0.57"
 # arp_request = ARP(pdst=target_ip)
 # broadcast = Ether(dst="ff:ff:ff:ff:ff:ff")
 # arp_request_broadcast = broadcast / arp_request
@@ -150,12 +136,13 @@ target_ip = "192.168.0.57"
 # else:
 #     print(f"Device not founded. IP: {target_ip}")
 
-icmp_request = IP(dst=target_ip) / ICMP()
-response = s.sr1(icmp_request, timeout=2, verbose=False)
-if response:
-    print(f"IP: {response.src}, ICMP: {response.summary()}")
-else:
-    print(f"Device not founded. IP: {target_ip}")
+# icmp_request = IP(dst=target_ip) / ICMP()
+# response = s.sr1(icmp_request, timeout=2, verbose=False)
+# if response:
+#     print(f"IP: {response.src}, ICMP: {response.summary()}")
+# else:
+#     print(f"Device not founded. IP: {target_ip}")
+
 
 # def found_devices(ip_range):
 #     arp_packet = ARP(pdst=ip_range)
@@ -166,8 +153,8 @@ else:
 #     for _, receive in ans:
 #         founded_devices.append((receive.psrc, receive.hwsrc))
 #     return founded_devices
-
-
+#
+#
 # def found_devices_icmp(ip_range):
 #     icmp_packet = IP(dst=ip_range)/ICMP()
 #     ans, _ = s.sr(icmp_packet, timeout=2, verbose=0)
@@ -198,12 +185,12 @@ else:
 # capture = s.sniff(iface='VirtualBox Host-Only Ethernet Adapter', count=10)
 # print(capture.nsummary())
 #
-# print("\n--------Discovery hosts on network using arping() function--------\n")
-# ans, unans = s.arping("192.168.0.0/24")
-# ans.summary()
-#
-# for res in ans.res:
-#     print(f"---> IP address discovered: {res[0].payload.pdst}")
+print("\n--------Discovery hosts on network using arping() function--------\n")
+ans, unans = s.arping("192.168.0.0/24")
+ans.summary()
+
+for res in ans.res:
+    print(f"---> IP address discovered: {res[0].payload.pdst}")
 
 
 # print("\n--------Discovery hosts on network using icmp ping--------\n")

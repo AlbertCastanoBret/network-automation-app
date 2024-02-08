@@ -1,10 +1,11 @@
 - id: 1
-  ip_address:
-  name: CSR-1000v
-  os: ios
-  transport: napalm
-  domain_name: albertquokka.com
-  password: albert
-  ssh_port: 22
+  ip_address: 192.168.0.27
+  hostname: FirstRouter
   username: albert
+  password: albert
+  os: ios
+  # transport: napalm
+  domain_name:
+  mac_address:
+  ssh_port: 22
   vendor: cisco
