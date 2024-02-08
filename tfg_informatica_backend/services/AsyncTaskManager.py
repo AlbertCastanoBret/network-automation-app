@@ -23,13 +23,17 @@ class AsyncTaskManager:
 
                         with app.app_context():
                             device_db = Device.query.filter_by(id=device.id).first()
+                            device_db.current_status = True
                             device_db.os_version = facts['os_version']
                             device_db.cpu = round(sum(cpu_info["%usage"] for cpu_info in environment['cpu'].values()) / len(environment['cpu']), 2)
                             device_db.memory = used_ram_mb
                             db.session.commit()
                 except Exception as e:
                     print(f"Failed to connect or retrieve data for {device.ip_address}: {e}")
-                    db.session.rollback()
+                    with app.app_context():
+                        device_db = Device.query.filter_by(id=device.id).first()
+                        device_db.current_status = False
+                        db.session.commit()
 
             print(f"Completed monitoring cycle for {len(devices)} devices.")
             await asyncio.sleep(device_monitor_interval)

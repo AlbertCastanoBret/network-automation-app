@@ -18,7 +18,7 @@ class Device(db.Model):
     ssh_port = db.Column(db.Integer, default=22)
     vendor = db.Column(db.String(50), nullable=False)
 
-    currentStatus = db.Column(db.Boolean, default=False)
+    current_status = db.Column(db.Boolean, default=False)
     os_version = db.Column(db.String(200))
     cpu = db.Column(db.String(50))
     memory = db.Column(db.String(200))
