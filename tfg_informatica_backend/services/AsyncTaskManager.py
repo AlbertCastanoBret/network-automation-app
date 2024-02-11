@@ -1,5 +1,4 @@
 import asyncio
-import sys
 
 import netifaces
 from ipaddress import ip_network
@@ -9,7 +8,7 @@ from models.device import Device
 from models.host import Host
 from services.DeviceManager import get_all_devices
 import scapy.all as s
-import socket
+from datetime import datetime
 
 
 class AsyncTaskManager:
@@ -41,6 +40,10 @@ class AsyncTaskManager:
                         device_db.current_status = False
                         db.session.commit()
 
+            now = datetime.now()
+            current_time = now.strftime("%H:%M:%S")
+            print("Current Time =", current_time)
+
             print(f"Completed monitoring cycle for {len(devices)} devices.")
             await asyncio.sleep(device_monitor_interval)
 
@@ -63,16 +66,11 @@ class AsyncTaskManager:
                 for _, received in ans:
                     ip_address = received.psrc
                     mac_address = received.hwsrc
-
-                    try:
-                        hostname = socket.gethostbyaddr(ip_address)[0]
-                    except socket.herror:
-                        hostname = "Unknown"
+                    hostname = "Unknown"
 
                     host = Host(name=hostname, ip_address=ip_address, mac_address=mac_address)
                     db.session.add(host)
                     db.session.commit()
 
-                    print(f"IP address: {ip_address}, MAC address: {mac_address}, Hostname: {hostname}")
-
+                print(f"Completed monitoring cycle for {len(ans)} hosts.")
             await asyncio.sleep(host_monitor_interval)
