@@ -37,14 +37,14 @@ async def run_async_tasks():
     try:
         await asyncio.gather(
             task_manager.monitor_devices(10),
-            task_manager.monitor_services(20),
+            task_manager.monitor_hosts(10),
         )
     except asyncio.CancelledError:
         print("Cancelled tasks.")
     except KeyboardInterrupt:
         print("Tasks manually interrupted.")
 
-
+from models.host import Host
 from services.DeviceManager import import_devices_from_file
 with app.app_context():
     db.create_all()
@@ -57,6 +57,7 @@ flask_thread.start()
 @app.route('/')
 def a():
     return "Hello world"
+
 
 # def find_ip_from_mac(mac_address):
 #     devices = s.arping("192.168.0.0/24", verbose=False)[0]
@@ -86,12 +87,6 @@ def a():
 # print("Answer from router: " + output)
 # net_connect.disconnect()
 #
-# so = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-# so.connect(("8.8.8.8", 80))
-# my_ip_addr = so.getsockname()[0]
-# print(f"My IP address is {my_ip_addr}")
-# subnet = ip_network(my_ip_addr + "/24", False)
-# print(subnet)
 
 
 # devices = [
@@ -184,13 +179,14 @@ def a():
 # print("\n--------Packet summaries--------\n")
 # capture = s.sniff(iface='VirtualBox Host-Only Ethernet Adapter', count=10)
 # print(capture.nsummary())
-#
-print("\n--------Discovery hosts on network using arping() function--------\n")
-ans, unans = s.arping("192.168.0.0/24")
-ans.summary()
 
-for res in ans.res:
-    print(f"---> IP address discovered: {res[0].payload.pdst}")
+
+# print("\n--------Discovery hosts on network using arping() function--------\n")
+# ans, unans = s.arping("192.168.0.0/24")
+# ans.summary()
+#
+# for res in ans.res:
+#     print(f"---> IP address discovered: {res[0].payload.pdst}")
 
 
 # print("\n--------Discovery hosts on network using icmp ping--------\n")

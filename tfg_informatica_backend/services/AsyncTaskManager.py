@@ -1,11 +1,15 @@
 import asyncio
-import socket
+import sys
 
+import netifaces
+from ipaddress import ip_network
 from napalm import get_network_driver
-
 from app import app, db
 from models.device import Device
+from models.host import Host
 from services.DeviceManager import get_all_devices
+import scapy.all as s
+import socket
 
 
 class AsyncTaskManager:
@@ -40,7 +44,35 @@ class AsyncTaskManager:
             print(f"Completed monitoring cycle for {len(devices)} devices.")
             await asyncio.sleep(device_monitor_interval)
 
-    async def monitor_services(self, compliance_monitor_interval):
+    async def monitor_hosts(self, host_monitor_interval):
         while True:
-            print("Monitoring services...")
-            await asyncio.sleep(compliance_monitor_interval)
+            with app.app_context():
+                db.session.query(Host).delete()
+                gateways = netifaces.gateways()
+                default_gateway = gateways['default'][netifaces.AF_INET][1]
+
+                addrs = netifaces.ifaddresses(default_gateway)
+                ip_info = addrs[netifaces.AF_INET][0]
+                ip_address = ip_info['addr']
+                netmask = ip_info['netmask']
+
+                network = ip_network(f"{ip_address}/{netmask}", strict=False)
+
+                ans, _ = s.arping(str(network))
+
+                for _, received in ans:
+                    ip_address = received.psrc
+                    mac_address = received.hwsrc
+
+                    try:
+                        hostname = socket.gethostbyaddr(ip_address)[0]
+                    except socket.herror:
+                        hostname = "Unknown"
+
+                    host = Host(name=hostname, ip_address=ip_address, mac_address=mac_address)
+                    db.session.add(host)
+                    db.session.commit()
+
+                    print(f"IP address: {ip_address}, MAC address: {mac_address}, Hostname: {hostname}")
+
+            await asyncio.sleep(host_monitor_interval)
