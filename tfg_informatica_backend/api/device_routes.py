@@ -1,6 +1,4 @@
-from os import abort
 from flask import jsonify
-
 from services.DeviceManager import get_device_by_id, get_all_devices
 from . import device_bp
 

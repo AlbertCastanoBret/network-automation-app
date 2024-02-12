@@ -18,7 +18,6 @@ export const CountdownTimer = ({time}) => {
             clearInterval(countdownIntervalId);
           };
         }, [time]);
-    console.log(countdown);
   return (
     <div>Next update in: {countdown} seconds</div>
   )

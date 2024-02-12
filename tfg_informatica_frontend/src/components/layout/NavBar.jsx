@@ -1,34 +1,31 @@
 import React from 'react'
+import { Link, NavLink } from 'react-router-dom';
 
 export const NavBar = () => {
     return (
         <nav className="navbar">
           <div className="navbar-container">
-            <a href="/" className="navbar-logo">
+            <Link to="/" className="navbar-logo">
               Dashboard
-            </a>
+            </Link>
             {}
-            <div className="menu-icon">
-              {}
-            </div>
-            <ul className="nav-menu">
-              <li className="nav-item">
-                <a href="/devices" className="nav-links">
+            <div className="nav-menu">
+              <NavLink 
+                className="nav-item"
+                to="/devices">
                   Devices
-                </a>
-              </li>
-              <li className="nav-item">
-                <a href="/services" className="nav-links">
+              </NavLink>
+              <NavLink 
+                className="nav-item"
+                to="/hosts">
+                  Hosts
+              </NavLink>
+              <NavLink 
+                className="nav-item"
+                to="/services">
                   Services
-                </a>
-              </li>
-              <li className="nav-item">
-                <a href="/events" className="nav-links">
-                  Events
-                </a>
-              </li>
-              {}
-            </ul>
+              </NavLink>
+            </div>
           </div>
         </nav>
     );

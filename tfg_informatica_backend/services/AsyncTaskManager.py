@@ -40,10 +40,6 @@ class AsyncTaskManager:
                         device_db.current_status = False
                         db.session.commit()
 
-            now = datetime.now()
-            current_time = now.strftime("%H:%M:%S")
-            print("Current Time =", current_time)
-
             print(f"Completed monitoring cycle for {len(devices)} devices.")
             await asyncio.sleep(device_monitor_interval)
 

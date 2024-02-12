@@ -22,9 +22,10 @@ app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///database.db'
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 db = SQLAlchemy(app)
 
-from api import device_bp
+from api import device_bp, host_bp
 
 app.register_blueprint(device_bp, url_prefix='/devices')
+app.register_blueprint(host_bp, url_prefix='/hosts')
 
 
 def run_flask_app():
@@ -36,8 +37,8 @@ async def run_async_tasks():
     task_manager = AsyncTaskManager()
     try:
         await asyncio.gather(
-            task_manager.monitor_devices(5),
-            task_manager.monitor_hosts(5),
+            task_manager.monitor_devices(10),
+            task_manager.monitor_hosts(20),
         )
     except asyncio.CancelledError:
         print("Cancelled tasks.")

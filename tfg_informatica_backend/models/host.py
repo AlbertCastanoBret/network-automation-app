@@ -10,3 +10,5 @@ class Host(db.Model):
     ip_address = db.Column(db.String(15), nullable=False)
     mac_address = db.Column(db.String(100), nullable=False)
 
+    def to_dict(self):
+        return {c.name: getattr(self, c.name) for c in self.__table__.columns}

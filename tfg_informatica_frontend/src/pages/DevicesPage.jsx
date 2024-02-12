@@ -47,7 +47,7 @@ export const DevicesPage = () => {
 
   return (
     <div className="devices-page">
-      <h1>Device</h1>
+      <h1>Devices</h1>
       <CountdownTimer time={10}></CountdownTimer>
       <Table columns={columns} data={devicesData}></Table>
     </div>
