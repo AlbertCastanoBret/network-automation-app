@@ -18,21 +18,20 @@ export const ChartsView = ({activeView}) => {
     const [statusData, setStatusData] = useState({ labels: [], datasets: [] });
 
     useEffect(() => {
+        if (activeView === 'status') {
         const loadData = async () => {
-            const apiData = await fetchData(`/devices/device_status/${deviceId}`);
-            prepareData(apiData);
-        }
+          const apiData = await fetchData(`/devices/device_status/${deviceId}`);
+          prepareData(apiData);
+        };
         loadData();
-
+    
         const intervalId = setInterval(() => {
-            loadData();
-          }, 10000)
-      
-          return () => {
-            clearInterval(intervalId);
-        }
-
-    }, [deviceId]);
+          loadData();
+        }, 10000);
+    
+        return () => clearInterval(intervalId);
+      }
+    }, [deviceId, activeView]);
 
     const prepareData = (data) => {
         data.sort((a, b) => new Date(a.timestamp) - new Date(b.timestamp));
