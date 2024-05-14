@@ -29,15 +29,31 @@ body {
 }
 
 h1 {
-  font-size: 3.2em;
+  font-size: 30px;
   line-height: 1.1;
+  color: #646cff;
+  font-style: italic;
+}
+
+h2 {
+  font-size: 24px;
+  line-height: 1.1;
+  color: #9ca1fc;
+}
+
+h3{
+  font-size: 18x;
+  line-height: 1.1;
+  color: white;
+  font-weight: 300;
+
 }
 
 button {
-  border-radius: 8px;
+  border-radius: 4px;
   border: 1px solid transparent;
   padding: 0.6em 1.2em;
-  font-size: 1em;
+  font-size: 18px;
   font-weight: 500;
   font-family: inherit;
   background-color: #1a1a1a;
@@ -49,7 +65,8 @@ button:hover {
 }
 button:focus,
 button:focus-visible {
-  outline: 4px auto -webkit-focus-ring-color;
+  transition: border-color 0.25s;
+  background-color: #646cff;
 }
 
 @media (prefers-color-scheme: light) {
@@ -71,7 +88,7 @@ button:focus-visible {
   display: flex;
   justify-content: center;
   align-items: center;
-  font-size: 1.2rem;
+  font-size: 18px;
 }
 
 .navbar-container {
@@ -81,6 +98,7 @@ button:focus-visible {
   z-index: 1;
   width: 100%;
   max-width: 1440px;
+  padding: 0 20px;
 }
 
 .navbar-logo {
@@ -88,7 +106,7 @@ button:focus-visible {
   justify-self: start;
   cursor: pointer;
   text-decoration: none;
-  font-size: 1.5rem;
+  font-size: 24px;
   display: flex;
   align-items: center;
 }
@@ -99,7 +117,6 @@ button:focus-visible {
   align-items: center;
   list-style: none;
   text-align: center;
-  padding: 0;
 }
 
 .nav-item {
@@ -107,10 +124,15 @@ button:focus-visible {
   text-decoration: none;
   cursor: pointer;
   margin-left: 30px;
+  transition: all 0.3s ease;
 }
 
 .nav-item:hover {
-  border-bottom: 2px solid #f9f9f9;
+  border-bottom: 2px solid #646cff;
+}
+
+.nav-item:focus{
+  color: #646cff;
 }
 
 .menu-icon {
@@ -120,10 +142,7 @@ button:focus-visible {
 .devices-page{
   max-width: 1440px;
   margin: auto;
-}
-
-.devices-page h1{
-  font-size: 36px;
+  padding: 0 20px;
 }
 
 .table{
@@ -132,7 +151,8 @@ button:focus-visible {
 }
 
 .table th, .table td{
-  padding: 20px 0 10px;
+  padding: 20px 10px 10px;
+  max-width: 200px;
 } 
 
 .table th{
@@ -157,4 +177,97 @@ button:focus-visible {
   background-color: red;
   border-radius: 50%;
   display: inline-block;
+}
+
+.icon-button{
+  font-size: 20px;
+  color: white;
+  transition: color 0.3s;
+}
+
+.icon-button:hover{
+  color: rgb(100, 108, 255);
+}
+
+.device-data-page{
+  max-width: 1440px;
+  margin: auto;
+  padding: 0 20px;
+}
+
+.device-data-container{
+  display: flex;
+  flex-direction: row;
+}
+
+.options-container{
+  width: 10%;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding-top: 20px;
+  min-width: 160px;
+}
+
+.charts-view{
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.charts-view h2{
+  padding-left: 20px;
+}
+
+.charts-container{
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.chart-device{
+  width: 100% !important;
+  max-width: 550px;
+  max-height: 400px;
+  margin: 0 20px 40px;
+}
+
+.facts-view{
+  padding-left: 20px;
+}
+
+.facts-row{
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  margin-bottom: 10px;
+}
+
+.facts-row > *{
+  margin: 0;
+}
+
+.facts-row > :first-child{
+  margin-right: 10px;
+  min-width: 120px;
+}
+
+.hosts-page{
+  max-width: 1440px;
+  margin: auto;
+  padding: 0 20px;
+}
+
+@media screen and (max-width: 992px) {
+  .device-data-container{
+    flex-direction: column;
+  }
+
+  .options-container{
+    width: 100%;
+    padding-top: 0;
+    max-width: 500px;
+    margin: auto;
+  }
 }

@@ -1,5 +1,5 @@
 from app import app
-from models.host import Host
+from models.Host import Host
 
 
 def get_host_by_id(device_id):

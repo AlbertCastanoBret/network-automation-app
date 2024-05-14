@@ -38,14 +38,14 @@ async def run_async_tasks():
     try:
         await asyncio.gather(
             task_manager.monitor_devices(10),
-            task_manager.monitor_hosts(20),
+            task_manager.monitor_hosts(5),
         )
     except asyncio.CancelledError:
         print("Cancelled tasks.")
     except KeyboardInterrupt:
         print("Tasks manually interrupted.")
 
-from models.host import Host
+from models.Host import Host
 from services.DeviceManager import import_devices_from_file
 with app.app_context():
     db.create_all()
@@ -53,7 +53,6 @@ with app.app_context():
 
 flask_thread = threading.Thread(target=lambda: asyncio.run(run_async_tasks()))
 flask_thread.start()
-
 
 @app.route('/')
 def a():

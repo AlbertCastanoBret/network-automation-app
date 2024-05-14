@@ -36,7 +36,7 @@ export const HostsPage = () => {
     ];
   
     return (
-      <div className="devices-page">
+      <div className="hosts-page">
         <h1>Hosts</h1>
         <CountdownTimer time={10}></CountdownTimer>
         <Table columns={columns} data={devicesData}></Table>

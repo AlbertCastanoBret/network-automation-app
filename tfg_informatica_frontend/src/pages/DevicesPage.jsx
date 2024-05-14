@@ -11,6 +11,7 @@ export const DevicesPage = () => {
     const loadData = async () => {
       const apiData = await fetchData('/devices');
       const mappedData = apiData.map((device) => ({
+        id: device.id,
         name: device.hostname,
         status: device.current_status ? 'Active' : 'Inactive',
         ip: device.ip_address,
@@ -18,7 +19,9 @@ export const DevicesPage = () => {
         os: device.os,
         osVersion: device.os_version ?? 'N/A',
         cpu: device.cpu ?? 'N/A',
-        memory: device.memory ?? 'N/A',
+        memory: device.memory_percentage ?? 'N/A',
+        responseTime: device.response_time ?? '0',
+        lastChecked: device.last_checked
       }));
       setDevices(mappedData);
     };
@@ -35,14 +38,16 @@ export const DevicesPage = () => {
   }, []);
 
   const columns = [
+    { title: 'Actions', field: 'actions'},
     { title: 'Name', field: 'name' },
     { title: 'Status', field: 'status' },
     { title: 'IP Address', field: 'ip' },
     { title: 'Vendor', field: 'vendor' },
     { title: 'OS', field: 'os' },
-    { title: 'OS Version', field: 'osVersion' },
     { title: 'CPU%', field: 'cpu'},
-    { title: 'Memory%', field: 'memory'}
+    { title: 'Memory%', field: 'memory'},
+    { title: 'Response Time', field: 'responseTime'},
+    { title: 'Last Checked', field: 'lastChecked'}
   ];
 
   return (
