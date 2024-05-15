@@ -45,7 +45,7 @@ export const FactsView = ({activeView}) => {
   }, [deviceId, activeView]);
 
   return (
-    <div className="facts-view" style={{ display: activeView === 'facts' ? 'block' : 'none' }}>
+    <div className="facts-view view" style={{ display: activeView === 'facts' ? 'block' : 'none' }}>
       <h2>Facts</h2>
       <div className="facts-row">
         <strong>FQDN</strong>

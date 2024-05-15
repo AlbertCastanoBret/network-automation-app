@@ -63,10 +63,6 @@ button {
 button:hover {
   border-color: #646cff;
 }
-button:focus,
-button:focus-visible {
-  background-color: #646cff;
-}
 
 .button-active{
   background-color: #646cff;
@@ -212,14 +208,14 @@ button:focus-visible {
   min-width: 160px;
 }
 
+.view{
+  padding-left: 20px;
+}
+
 .charts-view{
   display: flex;
   align-items: center;
   justify-content: center;
-}
-
-.charts-view h2{
-  padding-left: 20px;
 }
 
 .charts-container{
@@ -236,10 +232,6 @@ button:focus-visible {
   margin: 0 20px 40px;
 }
 
-.facts-view{
-  padding-left: 20px;
-}
-
 .facts-row{
   display: flex;
   flex-direction: row;
@@ -254,6 +246,14 @@ button:focus-visible {
 .facts-row > :first-child{
   margin-right: 10px;
   min-width: 120px;
+}
+
+.arp-table-view{
+  width: 100%;
+}
+
+.interfaces-table-view{
+  width: 100%;
 }
 
 .hosts-page{

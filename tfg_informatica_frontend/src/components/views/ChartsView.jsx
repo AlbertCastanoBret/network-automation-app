@@ -19,14 +19,14 @@ export const ChartsView = ({activeView}) => {
 
     useEffect(() => {
         if (activeView === 'status') {
-        const loadData = async () => {
-          const apiData = await fetchData(`/devices/device_status/${deviceId}`);
-          prepareData(apiData);
+            const loadData = async () => {
+            const apiData = await fetchData(`/devices/device_status/${deviceId}`);
+            prepareData(apiData);
         };
         loadData();
     
         const intervalId = setInterval(() => {
-          loadData();
+        loadData();
         }, 10000);
     
         return () => clearInterval(intervalId);
@@ -34,7 +34,7 @@ export const ChartsView = ({activeView}) => {
     }, [deviceId, activeView]);
 
     const prepareData = (data) => {
-        data.sort((a, b) => new Date(a.timestamp) - new Date(b.timestamp));
+        console.log('prepareData', data);
 
         const labels = data.map(item => {
             const date = new Date(item.timestamp);
@@ -101,12 +101,12 @@ export const ChartsView = ({activeView}) => {
     }
 
   return (
-    <div className="charts-view" style={{ display: activeView === 'status' ? 'block' : 'none' }}>
+    <div className="charts-view view" style={{ display: activeView === 'status' ? 'block' : 'none' }}>
         <h2> Status</h2> 
         <div className="charts-container">
             <Chart chartData={responseTimeData} title="Response Time" min={1} max={3}></Chart>
-            <Chart chartData={cpuData} title="CPU Usage" min={0} max={1}></Chart>
-            <Chart chartData={memoryData} title="Memory Usage" min={0} max={1024}></Chart>
+            <Chart chartData={cpuData} title="CPU Usage" min={0} max={100}></Chart>
+            <Chart chartData={memoryData} title="Memory Usage" min={0} max={100}></Chart>
             <Chart chartData={statusData} title="Status" min={0} max={1} limitTicksToValues={[0, 1]}></Chart>
         </div>
     </div>

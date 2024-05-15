@@ -38,7 +38,7 @@ async def run_async_tasks():
     try:
         await asyncio.gather(
             task_manager.monitor_devices(10),
-            task_manager.monitor_hosts(10),
+            task_manager.monitor_hosts(5),
         )
     except asyncio.CancelledError:
         print("Cancelled tasks.")

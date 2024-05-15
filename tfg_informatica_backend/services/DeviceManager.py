@@ -2,6 +2,8 @@ import yaml
 from datetime import datetime
 from models.Device import Device
 from models.DeviceStatus import DeviceStatus
+from models.DeviceArpEntry import DeviceArpEntry
+from models.DeviceInterface import DeviceInterface
 from app import db, app
 
 
@@ -26,8 +28,16 @@ def get_device_by_id(device_id):
     return Device.query.get(device_id)
 
 
-def get_device_status_list(device_id):
-    return DeviceStatus.query.filter_by(device_id=device_id).order_by(DeviceStatus.timestamp.desc()).all()
+def get_device_status_for_device(device_id):
+    return DeviceStatus.query.filter_by(device_id=device_id).order_by(DeviceStatus.timestamp).all()
+
+
+def get_arp_entries_for_device(device_id):
+    return DeviceArpEntry.query.filter_by(device_id=device_id).all()
+
+
+def get_interfaces_for_device(device_id):
+    return DeviceInterface.query.filter_by(device_id=device_id).all()
 
 
 def get_all_devices():

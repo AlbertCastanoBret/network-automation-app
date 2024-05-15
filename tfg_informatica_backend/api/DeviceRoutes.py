@@ -1,5 +1,6 @@
 from flask import jsonify
-from services.DeviceManager import get_device_by_id, get_all_devices, get_device_status_list
+from services.DeviceManager import get_device_by_id, get_all_devices, get_device_status_for_device, \
+    get_arp_entries_for_device, get_interfaces_for_device
 from . import device_bp
 
 
@@ -19,7 +20,20 @@ def get_devices():
 
 @device_bp.route('/device_status/<int:device_id>', methods=['GET'])
 def get_device_status(device_id):
-    device_status = get_device_status_list(device_id)
+    device_status = get_device_status_for_device(device_id)
     device_status_list = [status.to_dict() for status in device_status]
     return jsonify(device_status_list)
 
+
+@device_bp.route('/device_arp_table/<int:device_id>', methods=['GET'])
+def get_device_arp_table(device_id):
+    arp_table = get_arp_entries_for_device(device_id)
+    arp_table_list = [arp.to_dict() for arp in arp_table]
+    return jsonify(arp_table_list)
+
+
+@device_bp.route('/device_interfaces/<int:device_id>', methods=['GET'])
+def get_device_interface(device_id):
+    interfaces = get_interfaces_for_device(device_id)
+    interfaces_list = [interface.to_dict() for interface in interfaces]
+    return jsonify(interfaces_list)

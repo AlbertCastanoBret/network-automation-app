@@ -12,8 +12,8 @@ export const TableRow = ({ row, columns, index, data}) => {
                               <FaChartSimple></FaChartSimple>
                             </NavLink>
                 }
-                else if (column.field === 'status') {
-                  const statusClassName = row[column.field] == 'Active' ? 'status-active' : 'status-inactive';
+                else if (column.field === 'current_status') {
+                  const statusClassName = row[column.field] == true ? 'status-active' : 'status-inactive';
                   cellData = <span className={statusClassName}></span>;
                 } else {
                   cellData = row[column.field];
