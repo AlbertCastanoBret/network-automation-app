@@ -42,7 +42,8 @@ class AsyncTaskManager:
                 facts = device_conn.get_facts()
                 environment = device_conn.get_environment()
                 arp_table = device_conn.get_arp_table()
-                interfaces = device_conn.get_interfaces_counters()
+                interfaces = device_conn.get_interfaces()
+                interfaces_counters = device_conn.get_interfaces_counters()
 
                 used_cpu = round(
                     sum(cpu_info["%usage"] for cpu_info in environment['cpu'].values()) / len(environment['cpu']), 2)
@@ -55,7 +56,7 @@ class AsyncTaskManager:
                 response_time = round(end_time - start_time, 2)
 
                 self.update_device_status(device, facts, used_cpu, used_ram_mb, used_ram_percentage,
-                                          response_time, arp_table, interfaces)
+                                          response_time, arp_table, interfaces, interfaces_counters)
                 self.delete_oldest_status(device.id)
 
         except Exception as e:
@@ -64,7 +65,7 @@ class AsyncTaskManager:
 
     def update_device_status(self, device: Device, facts: dict, used_cpu: float, used_ram_mb: float,
                              used_ram_percentage: float, response_time: float, arp_table: list = None,
-                             interfaces: dict = None):
+                             interfaces: dict = None, interfaces_counters: dict = None):
         try:
             with app.app_context():
                 device_db = Device.query.filter_by(id=device.id).first()
@@ -90,8 +91,8 @@ class AsyncTaskManager:
                 if arp_table:
                     self.update_arp_table(device_db.id, arp_table)
 
-                if interfaces:
-                    self.update_interfaces_table(device_db.id, interfaces)
+                if interfaces_counters:
+                    self.update_interfaces_table(device_db.id, interfaces, interfaces_counters)
 
         except SQLAlchemyError as e:
             print(f"Database error: {e}")
@@ -129,24 +130,33 @@ class AsyncTaskManager:
         except SQLAlchemyError as e:
             print(f"Database error when updating ARP table: {e}")
 
-    def update_interfaces_table(self, device_id: int, interfaces: dict):
+    def update_interfaces_table(self, device_id: int, interfaces: dict, interfaces_counters: dict):
         try:
             with app.app_context():
                 DeviceInterface.query.filter_by(device_id=device_id).delete()
 
-                for interface, counters in interfaces.items():
-                    interface_entry = DeviceInterface(
-                        device_id=device_id,
-                        interface_name=interface,
-                        tx_errors=counters['tx_errors'],
-                        rx_errors=counters['rx_errors'],
-                        tx_discards=counters['tx_discards'],
-                        rx_discards=counters['rx_discards'],
-                        tx_unicast_packets=counters['tx_unicast_packets'],
-                        rx_unicast_packets=counters['rx_unicast_packets'],
-                    )
+                for interface, interfaces_info in interfaces.items():
+                    interface_entry = DeviceInterface(device_id=device_id)
+                    interface_entry.interface_name = interface
+                    interface_entry.is_up = interfaces_info['is_up']
+                    interface_entry.is_enabled = interfaces_info['is_enabled']
+                    interface_entry.description = interfaces_info['description']
+                    interface_entry.last_flapped = interfaces_info['last_flapped']
+                    interface_entry.speed = interfaces_info['speed']
+                    interface_entry.mac_address = interfaces_info['mac_address']
+
+                    interface_entry.tx_errors = interfaces_counters[interface]['tx_errors']
+                    interface_entry.rx_errors = interfaces_counters[interface]['rx_errors']
+                    interface_entry.tx_discards = interfaces_counters[interface]['tx_discards']
+                    interface_entry.rx_discards = interfaces_counters[interface]['rx_discards']
+                    interface_entry.tx_octets = interfaces_counters[interface]['tx_octets']
+                    interface_entry.rx_octets = interfaces_counters[interface]['rx_octets']
+                    interface_entry.tx_unicast_packets = interfaces_counters[interface]['tx_unicast_packets']
+                    interface_entry.rx_unicast_packets = interfaces_counters[interface]['rx_unicast_packets']
+
                     db.session.add(interface_entry)
-                db.session.commit()
+                    db.session.commit()
+
         except SQLAlchemyError as e:
             print(f"Database error when updating interfaces table: {e}")
 

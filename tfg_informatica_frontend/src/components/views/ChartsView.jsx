@@ -34,8 +34,6 @@ export const ChartsView = ({activeView}) => {
     }, [deviceId, activeView]);
 
     const prepareData = (data) => {
-        console.log('prepareData', data);
-
         const labels = data.map(item => {
             const date = new Date(item.timestamp);
             const userTimezoneOffset = date.getTimezoneOffset() * 60000;

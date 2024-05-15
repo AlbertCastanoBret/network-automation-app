@@ -66,6 +66,20 @@ button:hover {
 
 .button-active{
   background-color: #646cff;
+  transition: border-color 0.25s;
+}
+
+.arrow-button{
+  font-size: 18px;
+}
+
+.arrow-button:hover{
+  cursor: pointer;
+  color: #646cff;
+}
+
+.arrow-button.expanded {
+    transform: rotate(90deg);
 }
 
 @media (prefers-color-scheme: light) {
@@ -163,11 +177,19 @@ button:hover {
 }
 
 .table th {
-  border-bottom: 1px solid rgba(255, 255, 255, 0.87);
+  border-bottom: 1px solid #9ca1fc;
+}
+
+.secondary-table th{
+  border-bottom: 1px solid #c6c9ff;
 }
 
 .table td {
   text-align: center;
+}
+
+.table tr{
+  width: 100%;
 }
 
 .status-active {

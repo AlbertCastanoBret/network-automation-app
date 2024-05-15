@@ -13,7 +13,7 @@ export const DevicesPage = () => {
       const mappedData = apiData.map((device) => ({
         id: device.id,
         name: device.hostname,
-        status: device.current_status ? 'Active' : 'Inactive',
+        currentStatus: device.current_status ? 'Active' : 'Inactive',
         ip: device.ip_address,
         vendor: device.vendor,
         os: device.os,
@@ -40,7 +40,7 @@ export const DevicesPage = () => {
   const columns = [
     { title: 'Actions', field: 'actions'},
     { title: 'Name', field: 'name' },
-    { title: 'Status', field: 'status' },
+    { title: 'Status', field: 'currentStatus' },
     { title: 'IP Address', field: 'ip' },
     { title: 'Vendor', field: 'vendor' },
     { title: 'OS', field: 'os' },

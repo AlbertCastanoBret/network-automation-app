@@ -1,8 +1,8 @@
 import React from 'react'
-import { FaChartSimple } from 'react-icons/fa6';
+import { FaAngleRight, FaChartSimple } from 'react-icons/fa6';
 import { NavLink } from 'react-router-dom';
 
-export const TableRow = ({ row, columns, index, data}) => {
+export const TableRow = ({ row, columns, index, isExpanded, onToggle}) => {
     return (
         <tr>
             {columns.map((column) => {
@@ -12,8 +12,14 @@ export const TableRow = ({ row, columns, index, data}) => {
                               <FaChartSimple></FaChartSimple>
                             </NavLink>
                 }
-                else if (column.field === 'current_status') {
-                  const statusClassName = row[column.field] == true ? 'status-active' : 'status-inactive';
+                else if (column.field === 'arrowButton') {
+                  cellData = <FaAngleRight
+                    className={`arrow-button ${isExpanded ? 'expanded' : ''}`}
+                    onClick={onToggle}
+                  />
+                }
+                else if (column.field === 'currentStatus' || column.field === 'isEnabled' || column.field === 'isUp') {
+                  const statusClassName = row[column.field] == 'Active' ? 'status-active' : 'status-inactive';
                   cellData = <span className={statusClassName}></span>;
                 } else {
                   cellData = row[column.field];
