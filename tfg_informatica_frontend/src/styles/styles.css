@@ -144,21 +144,29 @@ button:hover {
   padding: 0 20px;
 }
 
-.table{
+.table-container {
+  width: 100%;
+  overflow-x: auto;
+}
+
+.table {
   width: 100%;
   border-collapse: collapse;
 }
 
-.table th, .table td{
-  padding: 20px 10px 10px;
+.table th, .table td {
   max-width: 200px;
-} 
+  padding: 10px 5px;
+  white-space: normal;
+  text-overflow: ellipsis;
+  overflow: hidden;
+}
 
-.table th{
+.table th {
   border-bottom: 1px solid rgba(255, 255, 255, 0.87);
 }
 
-.table td{
+.table td {
   text-align: center;
 }
 
@@ -272,5 +280,9 @@ button:hover {
     padding-top: 0;
     max-width: 500px;
     margin: auto;
+  }
+
+  .view{
+    padding-left: 0;
   }
 }
