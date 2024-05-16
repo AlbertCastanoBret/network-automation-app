@@ -12,6 +12,7 @@ from models.Device import Device
 from models.DeviceStatus import DeviceStatus
 from models.DeviceArpEntry import DeviceArpEntry
 from models.DeviceInterface import DeviceInterface
+from models.DeviceBgpNeighbor import DeviceBgpNeighbor
 from models.Host import Host
 from services.DeviceManager import get_all_devices
 import scapy.all as s
@@ -44,6 +45,34 @@ class AsyncTaskManager:
                 arp_table = device_conn.get_arp_table()
                 interfaces = device_conn.get_interfaces()
                 interfaces_counters = device_conn.get_interfaces_counters()
+                bgp_neighbors = {
+                    "global": {
+                        "router_id": "10.0.1.1",
+                        "peers": {
+                            "10.0.0.2": {
+                                "local_as": 65000,
+                                "remote_as": 65000,
+                                "remote_id": "10.0.1.2",
+                                "is_up": True,
+                                "is_enabled": True,
+                                "description": "internal-2",
+                                "uptime": 4838400,
+                                "address_family": {
+                                    "ipv4": {
+                                        "sent_prefixes": 637213,
+                                        "accepted_prefixes": 3142,
+                                        "received_prefixes": 3142
+                                    },
+                                    "ipv6": {
+                                        "sent_prefixes": 36714,
+                                        "accepted_prefixes": 148,
+                                        "received_prefixes": 148
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
 
                 used_cpu = round(
                     sum(cpu_info["%usage"] for cpu_info in environment['cpu'].values()) / len(environment['cpu']), 2)
@@ -56,7 +85,8 @@ class AsyncTaskManager:
                 response_time = round(end_time - start_time, 2)
 
                 self.update_device_status(device, facts, used_cpu, used_ram_mb, used_ram_percentage,
-                                          response_time, arp_table, interfaces, interfaces_counters)
+                                          response_time, arp_table, interfaces, interfaces_counters,
+                                          bgp_neighbors)
                 self.delete_oldest_status(device.id)
 
         except Exception as e:
@@ -65,9 +95,11 @@ class AsyncTaskManager:
 
     def update_device_status(self, device: Device, facts: dict, used_cpu: float, used_ram_mb: float,
                              used_ram_percentage: float, response_time: float, arp_table: list = None,
-                             interfaces: dict = None, interfaces_counters: dict = None):
+                             interfaces: dict = None, interfaces_counters: dict = None,
+                             bgp_neighbors: dict = None):
         try:
             with app.app_context():
+                db.session.begin()
                 device_db = Device.query.filter_by(id=device.id).first()
                 device_db.current_status = True
 
@@ -94,12 +126,22 @@ class AsyncTaskManager:
                 if interfaces_counters:
                     self.update_interfaces_table(device_db.id, interfaces, interfaces_counters)
 
+                if bgp_neighbors:
+                    self.update_bgp_table(device_db.id, bgp_neighbors)
+
         except SQLAlchemyError as e:
+            db.session.rollback()
             print(f"Database error: {e}")
+
+        except Exception as e:
+            db.session.rollback()
+            print(f"An unexpected error occurred: {e}")
+
 
     def update_device_status_table(self, device_id: int, status: bool, cpu: float, memory: float, response_time: float):
         try:
             with app.app_context():
+                db.session.begin()
                 device_status_db = DeviceStatus(
                     device_id=device_id,
                     timestamp=datetime.now(),
@@ -110,12 +152,18 @@ class AsyncTaskManager:
 
                 db.session.add(device_status_db)
                 db.session.commit()
+
         except SQLAlchemyError as e:
             print(f"Database error: {e}")
+
+        except Exception as e:
+            db.session.rollback()
+            print(f"An unexpected error occurred: {e}")
 
     def update_arp_table(self, device_id: int, arp_table: list):
         try:
             with app.app_context():
+                db.session.begin()
                 DeviceArpEntry.query.filter_by(device_id=device_id).delete()
 
                 for entry in arp_table:
@@ -127,12 +175,19 @@ class AsyncTaskManager:
                     )
                     db.session.add(arp_entry)
                 db.session.commit()
+
         except SQLAlchemyError as e:
+            db.session.rollback()
             print(f"Database error when updating ARP table: {e}")
+
+        except Exception as e:
+            db.session.rollback()
+            print(f"An unexpected error occurred: {e}")
 
     def update_interfaces_table(self, device_id: int, interfaces: dict, interfaces_counters: dict):
         try:
             with app.app_context():
+                db.session.begin()
                 DeviceInterface.query.filter_by(device_id=device_id).delete()
 
                 for interface, interfaces_info in interfaces.items():
@@ -155,24 +210,72 @@ class AsyncTaskManager:
                     interface_entry.rx_unicast_packets = interfaces_counters[interface]['rx_unicast_packets']
 
                     db.session.add(interface_entry)
-                    db.session.commit()
+                db.session.commit()
 
         except SQLAlchemyError as e:
+            db.session.rollback()
             print(f"Database error when updating interfaces table: {e}")
+
+        except Exception as e:
+            db.session.rollback()
+            print(f"An unexpected error occurred: {e}")
+
+    def update_bgp_table(self, device_id: int, bgp_neighbors: dict):
+        try:
+            with app.app_context():
+                db.session.begin()
+                DeviceBgpNeighbor.query.filter_by(device_id=device_id).delete()
+
+                for vrf, vrf_data in bgp_neighbors.items():
+                    for neighbor, neighbor_data in vrf_data['peers'].items():
+                        bgp_entry = DeviceBgpNeighbor(
+                            device_id=device_id,
+                            neighbor_address=neighbor,
+                            local_as=neighbor_data['local_as'],
+                            remote_as=neighbor_data['remote_as'],
+                            remote_id=neighbor_data['remote_id'],
+                            is_up=neighbor_data['is_up'],
+                            is_enabled=neighbor_data['is_enabled'],
+                            uptime=neighbor_data['uptime'],
+                            sent_prefixes_ipv4=neighbor_data['address_family']['ipv4']['sent_prefixes'],
+                            accepted_prefixes_ipv4=neighbor_data['address_family']['ipv4']['accepted_prefixes'],
+                            received_prefixes_ipv4=neighbor_data['address_family']['ipv4']['received_prefixes'],
+                            sent_prefixes_ipv6=neighbor_data['address_family']['ipv6']['sent_prefixes'],
+                            accepted_prefixes_ipv6=neighbor_data['address_family']['ipv6']['accepted_prefixes'],
+                            received_prefixes_ipv6=neighbor_data['address_family']['ipv6']['received_prefixes']
+                        )
+                        db.session.add(bgp_entry)
+                db.session.commit()
+
+        except SQLAlchemyError as e:
+            db.session.rollback()
+            print(f"Database error when updating BGP table: {e}")
+
+        except Exception as e:
+            db.session.rollback()
+            print(f"An unexpected error occurred: {e}")
 
     def update_device_status_failure(self, device_id: int):
         try:
             with app.app_context():
+                db.session.begin()
                 device_db = Device.query.filter_by(id=device_id).first()
                 device_db.current_status = False
                 device_db.response_time = 0
                 db.session.commit()
+
         except SQLAlchemyError as e:
+            db.session.rollback()
             print(f"Database error: {e}")
+
+        except Exception as e:
+            db.session.rollback()
+            print(f"An unexpected error occurred: {e}")
 
     def delete_oldest_status(self, device_id: int):
         try:
             with app.app_context():
+                db.session.commit()
                 count = DeviceStatus.query.filter_by(device_id=device_id).count()
                 if count > self.MAX_RECORDS_PER_DEVICE:
                     excess = count - self.MAX_RECORDS_PER_DEVICE
@@ -182,8 +285,14 @@ class AsyncTaskManager:
                     for record in oldest_records:
                         db.session.delete(record)
                     db.session.commit()
+
         except SQLAlchemyError as e:
+            db.session.rollback()
             print(f"Database error: {e}")
+
+        except Exception as e:
+            db.session.rollback()
+            print(f"An unexpected error occurred: {e}")
 
     async def monitor_hosts(self, host_monitor_interval: int):
         while True:
@@ -223,9 +332,11 @@ class AsyncTaskManager:
     def update_hosts(self, hosts):
         try:
             with app.app_context():
+                db.session.begin()
                 db.session.query(Host).delete()
                 for host in hosts:
                     db.session.add(host)
                 db.session.commit()
         except Exception as e:
+            db.session.rollback()
             print(f"Failed to update hosts: {e}")

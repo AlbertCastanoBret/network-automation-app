@@ -286,6 +286,10 @@ button:hover {
   width: 100%;
 }
 
+.bgp-neighbors-table-view{
+  width: 100%;
+}
+
 .hosts-page{
   max-width: 1440px;
   margin: auto;

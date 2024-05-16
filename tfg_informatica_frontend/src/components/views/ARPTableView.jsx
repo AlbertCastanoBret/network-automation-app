@@ -13,7 +13,7 @@ export const ARPTableView = ({activeView}) => {
     useEffect(() => {
         if (activeView === 'arp-table') {
             const loadData = async () => {
-            const apiData = await fetchData(`/devices/device_arp_table/${deviceId}`);
+            const apiData = await fetchData(`/devices/arp_table/${deviceId}`);
             const mappedData = apiData.map((arpRow) => ({
                 ip_address: arpRow.ip_address ?? 'N/A',
                 mac_address: arpRow.mac_address ?? 'N/A',

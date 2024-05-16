@@ -4,6 +4,7 @@ import { ARPTableView} from '../components/views/ARPTableView';
 import { FactsView } from '../components/views/FactsView';
 import { ChartsView } from '../components/views/ChartsView';
 import { InterfacesTableView } from '../components/views/InterfacesTableView';
+import { BGPNeighborsView } from '../components/views/BGPNeighborsView';
 
 ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend);
 
@@ -20,11 +21,13 @@ const DeviceDataPage = () => {
                     <button className={`button ${activeView === 'facts' ? 'button-active' : ''}`} onClick={() => setActiveView('facts')}>Facts</button>
                     <button className={`button ${activeView === 'arp-table' ? 'button-active' : ''}`} onClick={() => setActiveView('arp-table')}>ARP Table</button>
                     <button className={`button ${activeView === 'interfaces-table' ? 'button-active' : ''}`} onClick={() => setActiveView('interfaces-table')}>Interfaces</button>
+                    <button className={`button ${activeView === 'bgp-neighbors-table' ? 'button-active' : ''}`} onClick={() => setActiveView('bgp-neighbors-table')}>BGP</button>
                 </div>
                 <ChartsView activeView={activeView}></ChartsView>
                 <FactsView activeView={activeView}></FactsView>
                 <ARPTableView activeView={activeView}></ARPTableView>
                 <InterfacesTableView activeView={activeView}></InterfacesTableView>
+                <BGPNeighborsView activeView={activeView}></BGPNeighborsView>
             </div>
         </div>
     );

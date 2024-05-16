@@ -13,7 +13,7 @@ export const InterfacesTableView = ({activeView}) => {
     useEffect(() => {
         if (activeView === 'interfaces-table') {
             const loadData = async () => {
-            const apiData = await fetchData(`/devices/device_interfaces/${deviceId}`);
+            const apiData = await fetchData(`/devices/interfaces/${deviceId}`);
             const mappedData = apiData.map((interfaceRow) => ({
                 interfaceName: interfaceRow.interface_name ?? 'N/A',
                 isEnabled: interfaceRow.is_enabled ? 'Active' : 'Inactive',
@@ -43,8 +43,8 @@ export const InterfacesTableView = ({activeView}) => {
     const columns = [
         { title: '', field: 'arrowButton'},
         { title: 'Interface Name', field: 'interfaceName'},
-        { title: 'Physical Status', field: 'isEnabled' },
         { title: 'Operational Status', field: 'isUp' },
+        { title: 'Administrative Status', field: 'isEnabled' },
         { title: 'Speed', field: 'speed' },
     ];
 

@@ -20,7 +20,7 @@ export const ChartsView = ({activeView}) => {
     useEffect(() => {
         if (activeView === 'status') {
             const loadData = async () => {
-            const apiData = await fetchData(`/devices/device_status/${deviceId}`);
+            const apiData = await fetchData(`/devices/status/${deviceId}`);
             prepareData(apiData);
         };
         loadData();

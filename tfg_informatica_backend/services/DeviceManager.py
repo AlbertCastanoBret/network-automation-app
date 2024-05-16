@@ -4,6 +4,7 @@ from models.Device import Device
 from models.DeviceStatus import DeviceStatus
 from models.DeviceArpEntry import DeviceArpEntry
 from models.DeviceInterface import DeviceInterface
+from models.DeviceBgpNeighbor import DeviceBgpNeighbor
 from app import db, app
 
 
@@ -38,6 +39,10 @@ def get_arp_entries_for_device(device_id):
 
 def get_interfaces_for_device(device_id):
     return DeviceInterface.query.filter_by(device_id=device_id).all()
+
+
+def get_bgp_entries_for_device(device_id):
+    return DeviceBgpNeighbor.query.filter_by(device_id=device_id).all()
 
 
 def get_all_devices():

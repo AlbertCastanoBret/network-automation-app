@@ -36,6 +36,7 @@ class Device(db.Model):
     device_statuses = db.relationship('DeviceStatus', backref='device', lazy=True)
     arp_entries = db.relationship('DeviceArpEntry', backref='device', lazy=True)
     interfaces = db.relationship('DeviceInterface', backref='device', lazy=True)
+    bgp_neighbors = db.relationship('DeviceBgpNeighbor', backref='device', lazy=True)
 
     def to_dict(self):
         return {c.name: getattr(self, c.name) for c in self.__table__.columns}
