@@ -33,6 +33,8 @@ class Device(db.Model):
     response_time = db.Column(db.Float, default=0.0, nullable=False)
     last_checked = db.Column(db.DateTime, default=datetime.utcnow, nullable=False)
 
+    current_configuration = db.Column(db.String(), nullable=True)
+
     device_statuses = db.relationship('DeviceStatus', backref='device', lazy=True)
     arp_entries = db.relationship('DeviceArpEntry', backref='device', lazy=True)
     interfaces = db.relationship('DeviceInterface', backref='device', lazy=True)

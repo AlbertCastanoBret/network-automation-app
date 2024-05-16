@@ -215,7 +215,7 @@ button:hover {
 }
 
 .icon-button:hover{
-  color: rgb(100, 108, 255);
+  color: #646cff;
 }
 
 .device-data-page{
@@ -288,6 +288,43 @@ button:hover {
 
 .bgp-neighbors-table-view{
   width: 100%;
+}
+
+.terminal-view{
+  width: 100%;
+}
+
+.terminal-screen{
+  width: 98%;
+  height: 400px;
+  background-color: #333;
+  padding: 6px 1%;
+  overflow-x: auto;
+  border-radius: 4px;
+}
+
+.terminal-screen *{
+  margin: 0;
+}
+
+.terminal-input-container{
+  width: 100%;
+}
+
+.terminal-input{
+  width: 98%;
+  border: none;
+  border-bottom: 1px solid #646cff;
+  transition: all 0.3s ease;
+  font-size: 18px;
+  margin-top: 6px;
+  padding: 6px 1%;
+  border-radius: 4px;
+}
+
+.terminal-input:focus,
+.terminal-input:hover{
+  border: none;
 }
 
 .hosts-page{

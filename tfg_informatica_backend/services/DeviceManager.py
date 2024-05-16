@@ -6,6 +6,7 @@ from models.DeviceArpEntry import DeviceArpEntry
 from models.DeviceInterface import DeviceInterface
 from models.DeviceBgpNeighbor import DeviceBgpNeighbor
 from app import db, app
+from napalm import get_network_driver
 
 
 def import_devices_from_file(filename, filetype):
@@ -49,6 +50,21 @@ def get_all_devices():
     with app.app_context():
         devices = Device.query.all()
     return devices
+
+
+def execute_cli_command(device_id, command):
+    device = get_device_by_id(device_id)
+    if not device:
+        return None, "Device not found"
+
+    try:
+        driver = get_network_driver(device.os)
+        with driver(hostname=device.ip_address, username=device.username, password=device.password,
+                    optional_args={'port': device.ssh_port}) as device_conn:
+            result = device_conn.cli([command])
+        return result, None
+    except Exception as e:
+        return None, str(e)
 
 
 def set_devices(devices):

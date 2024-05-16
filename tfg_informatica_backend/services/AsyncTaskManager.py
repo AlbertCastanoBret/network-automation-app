@@ -42,6 +42,7 @@ class AsyncTaskManager:
             with driver(device.ip_address, device.username, device.password) as device_conn:
                 facts = device_conn.get_facts()
                 environment = device_conn.get_environment()
+                config = device_conn.get_config()
                 arp_table = device_conn.get_arp_table()
                 interfaces = device_conn.get_interfaces()
                 interfaces_counters = device_conn.get_interfaces_counters()
@@ -73,6 +74,11 @@ class AsyncTaskManager:
                         }
                     }
                 }
+                commands = [
+                    'show version',
+                    'show ip interface brief'
+                ]
+                print(device_conn.cli(commands))
 
                 used_cpu = round(
                     sum(cpu_info["%usage"] for cpu_info in environment['cpu'].values()) / len(environment['cpu']), 2)
@@ -85,7 +91,7 @@ class AsyncTaskManager:
                 response_time = round(end_time - start_time, 2)
 
                 self.update_device_status(device, facts, used_cpu, used_ram_mb, used_ram_percentage,
-                                          response_time, arp_table, interfaces, interfaces_counters,
+                                          response_time, config, arp_table, interfaces, interfaces_counters,
                                           bgp_neighbors)
                 self.delete_oldest_status(device.id)
 
@@ -94,7 +100,7 @@ class AsyncTaskManager:
             self.update_device_status_failure(device.id)
 
     def update_device_status(self, device: Device, facts: dict, used_cpu: float, used_ram_mb: float,
-                             used_ram_percentage: float, response_time: float, arp_table: list = None,
+                             used_ram_percentage: float, response_time: float, config: dict = None, arp_table: list = None,
                              interfaces: dict = None, interfaces_counters: dict = None,
                              bgp_neighbors: dict = None):
         try:
@@ -103,19 +109,24 @@ class AsyncTaskManager:
                 device_db = Device.query.filter_by(id=device.id).first()
                 device_db.current_status = True
 
-                device_db.fqdn = facts['fqdn']
-                device_db.hostname = facts['hostname']
-                device_db.model = facts['model']
-                device_db.os_version = facts['os_version']
-                device_db.serial = facts['serial_number']
-                device_db.vendor = facts['vendor']
-                device_db.uptime = facts['uptime']
+                if facts:
+                    device_db.fqdn = facts['fqdn']
+                    device_db.hostname = facts['hostname']
+                    device_db.model = facts['model']
+                    device_db.os_version = facts['os_version']
+                    device_db.serial = facts['serial_number']
+                    device_db.vendor = facts['vendor']
+                    device_db.uptime = facts['uptime']
 
                 device_db.cpu = used_cpu
                 device_db.memory = used_ram_mb
                 device_db.response_time = response_time
                 device_db.memory_percentage = used_ram_percentage
                 device_db.last_checked = datetime.now()
+
+                if config:
+                    device_db.current_configuration = config['startup']
+
                 db.session.commit()
 
                 self.update_device_status_table(device_db.id, True, used_cpu, used_ram_percentage, response_time)
