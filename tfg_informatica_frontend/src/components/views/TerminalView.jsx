@@ -3,8 +3,7 @@ import React, { useState } from 'react';
 import { useLocation } from 'react-router-dom';
 
 const TerminalView = ({ activeView }) => {
-
-  const [command, setCommand] = useState('');
+  const [commands, setCommands] = useState('');
   const [result, setResult] = useState('');
   const [error, setError] = useState('');
 
@@ -12,25 +11,38 @@ const TerminalView = ({ activeView }) => {
   const { deviceId } = queryString.parse(location.search);
 
   const handleCommandSubmit = async () => {
+    setError(''); // Clear any previous error
+    setResult(''); // Clear previous result
+
+    // Validate commands format
+    const commandList = commands.split(', ').filter(cmd => cmd.trim() !== '');
+    if (!commandList.length || !commands.match(/^(\w+.*?, )*\w+.*?$/)) {
+      setError('Invalid command format. Use comma and space to separate commands, e.g., "sh version, sh ip interface brief".');
+      return;
+    }
+
     try {
       const response = await fetch(`${import.meta.env.VITE_BACKEND_URL}/devices/cli/${deviceId}`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
         },
-        body: JSON.stringify({ command })
+        body: JSON.stringify({ commands: commandList })
       });
-      setError('');
-      setResult('')
       const data = await response.json();
       if (data.error) {
         setError(data.error);
       } else {
-        const commandOutput = data[command] || "Command executed successfully";
+        const commandOutput = Object.entries(data).map(([cmd, output]) => (
+          <div key={cmd}>
+            <span className="terminal-command">{`Command: ${cmd}`}</span>
+            <pre>{output}</pre>
+          </div>
+        ));
         setResult(commandOutput);
       }
     } catch (error) {
-      setError('Error executing command');
+      setError('Error executing commands');
     }
   };
 
@@ -44,18 +56,18 @@ const TerminalView = ({ activeView }) => {
     <div className="terminal-view view" style={{ display: activeView === 'terminal' ? 'block' : 'none' }}>
       <h2>CLI Terminal</h2>
       <div className="terminal-screen">
-        {result && <pre>{result}</pre>}
+        {result}
         {error && <pre className="error">{error}</pre>}
       </div>
       <input 
         type="text" 
         className="terminal-input" 
-        value={command} 
-        onChange={(e) => setCommand(e.target.value)} 
+        value={commands} 
+        onChange={(e) => setCommands(e.target.value)} 
         onKeyDown={handleKeyDown}
-        placeholder="Enter CLI command" 
+        placeholder="Enter CLI commands separated by comma and space" 
       />
-      <button onClick={handleCommandSubmit} style={{marginTop: "6px"}}>Execute</button>
+      <button onClick={handleCommandSubmit} style={{ marginTop: "6px" }}>Execute</button>
     </div>
   );
 };

@@ -1,0 +1,15 @@
+
+
+
+FirstRouter#
+FirstRouter#terminal width 511
+FirstRouter#terminal length 0
+FirstRouter#
+FirstRouter#conf t
+Enter configuration commands, one per line.  End with CNTL/Z.
+FirstRouter(config)#interface gig1
+FirstRouter(config-if)#
+FirstRouter(config-if)#
+FirstRouter(config-if)#end
+FirstRouter#
+FirstRouter#exit

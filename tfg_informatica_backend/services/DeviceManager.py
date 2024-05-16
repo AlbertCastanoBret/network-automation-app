@@ -7,6 +7,7 @@ from models.DeviceInterface import DeviceInterface
 from models.DeviceBgpNeighbor import DeviceBgpNeighbor
 from app import db, app
 from napalm import get_network_driver
+from netmiko import ConnectHandler
 
 
 def import_devices_from_file(filename, filetype):
@@ -52,17 +53,34 @@ def get_all_devices():
     return devices
 
 
-def execute_cli_command(device_id, command):
+from netmiko import ConnectHandler
+
+
+def execute_cli_commands(device_id, commands, is_config=False):
     device = get_device_by_id(device_id)
     if not device:
         return None, "Device not found"
 
+    device_params = {
+        'device_type': 'cisco_xe',
+        'ip': device.ip_address,
+        'username': device.username,
+        'password': device.password,
+        'port': device.ssh_port,
+        'session_log': 'netmiko_session.log'
+    }
+
+    results = {}
     try:
-        driver = get_network_driver(device.os)
-        with driver(hostname=device.ip_address, username=device.username, password=device.password,
-                    optional_args={'port': device.ssh_port}) as device_conn:
-            result = device_conn.cli([command])
-        return result, None
+        with ConnectHandler(**device_params) as net_connect:
+            if is_config:
+                output = net_connect.send_config_set(commands)
+                results["config_commands"] = output
+            else:
+                for command in commands:
+                    output = net_connect.send_command(command, expect_string=r"#", read_timeout=60)
+                    results[command] = output
+        return results, None
     except Exception as e:
         return None, str(e)
 

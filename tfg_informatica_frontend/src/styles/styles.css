@@ -307,6 +307,12 @@ button:hover {
   margin: 0;
 }
 
+.terminal-command{
+  color: #646cff;
+  font-size: 14px;
+  font-style: italic;
+}
+
 .terminal-input-container{
   width: 100%;
 }

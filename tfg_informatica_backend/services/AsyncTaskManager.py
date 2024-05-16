@@ -74,11 +74,7 @@ class AsyncTaskManager:
                         }
                     }
                 }
-                commands = [
-                    'show version',
-                    'show ip interface brief'
-                ]
-                print(device_conn.cli(commands))
+                device_conn.close()
 
                 used_cpu = round(
                     sum(cpu_info["%usage"] for cpu_info in environment['cpu'].values()) / len(environment['cpu']), 2)

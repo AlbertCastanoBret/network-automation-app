@@ -1,7 +1,7 @@
 from flask import jsonify
 from flask import request
 from services.DeviceManager import get_device_by_id, get_all_devices, get_device_status_for_device, \
-    get_arp_entries_for_device, get_interfaces_for_device, get_bgp_entries_for_device, execute_cli_command
+    get_arp_entries_for_device, get_interfaces_for_device, get_bgp_entries_for_device, execute_cli_commands
 from . import device_bp
 
 
@@ -48,13 +48,16 @@ def get_device_bgp_neighbors(device_id):
 
 
 @device_bp.route('/cli/<int:device_id>', methods=['POST'])
-def execute_command(device_id):
+def execute_commands(device_id):
     data = request.json
-    command = data.get('command')
-    if not command:
-        return jsonify({"error": "No command provided"}), 400
+    commands = data.get('commands')
+    is_config = data.get('is_config', False)
 
-    result, error = execute_cli_command(device_id, command)
+    if not commands or not isinstance(commands, list):
+        return jsonify({"error": "Invalid or no commands provided"}), 400
+
+    results, error = execute_cli_commands(device_id, commands, is_config)
     if error:
         return jsonify({"error": error}), 500
-    return jsonify(result)
+    return jsonify(results)
+
