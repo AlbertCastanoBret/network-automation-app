@@ -3,7 +3,12 @@ import { FaTrashRestore } from 'react-icons/fa';
 import { FaAngleRight, FaChartSimple, FaGear } from 'react-icons/fa6';
 import { NavLink } from 'react-router-dom';
 
-export const TableRow = ({ row, columns, index, isExpanded, onToggle, onRestore, isLastRow }) => {
+export const TableRow = ({ row, columns, index, isExpanded, onToggle, onRestore, onSelect, isLastRow }) => {
+
+  const handleSelectChange = (e) => {
+    onSelect(e, row.id);
+  };
+
   return (
     <tr>
       {columns.map((column) => {
@@ -33,6 +38,15 @@ export const TableRow = ({ row, columns, index, isExpanded, onToggle, onRestore,
               onClick={() => onRestore(row)}
             />
           ) : null;
+        } else if (column.field === 'select'){
+          cellData = (
+            <input
+              type="checkbox"
+              checked={row.isSelected}
+              onChange={handleSelectChange}
+            />
+          );
+        
         } else if (column.field === 'currentStatus' || column.field === 'isEnabled' || column.field === 'isUp') {
           const statusClassName = row[column.field] === 'Active' ? 'status-active' : 'status-inactive';
           cellData = <span className={statusClassName}></span>;

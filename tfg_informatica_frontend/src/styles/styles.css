@@ -36,7 +36,7 @@ h1 {
 }
 
 h2 {
-  font-size: 24px;
+  font-size: 22px;
   line-height: 1.1;
   color: #9ca1fc;
 }
@@ -132,20 +132,22 @@ button:hover {
   text-align: center;
 }
 
-.nav-item {
+.nav-item span{
   color: #fff;
   text-decoration: none;
   cursor: pointer;
-  margin-left: 30px;
+  margin-left: 2px;
   transition: all 0.3s ease;
 }
 
-.nav-item:hover {
+.nav-item span:hover {
+  color: #646cff;
   border-bottom: 2px solid #646cff;
 }
 
-.nav-item:focus{
+.active-nav-item span {
   color: #646cff;
+  border-bottom: 2px solid #646cff;
 }
 
 .menu-icon {
@@ -321,21 +323,62 @@ button:hover {
 .terminal-input{
   width: 98%;
   border: none;
-  border-bottom: 1px solid #646cff;
   transition: all 0.3s ease;
   font-size: 18px;
   margin-top: 6px;
   padding: 6px 1%;
   border-radius: 4px;
+  font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
 }
 
 .terminal-input:focus,
 .terminal-input:hover{
   border: none;
+  border-bottom: 1px solid #646cff;
 }
 
 .config-history-view {
   width: 100%;
+}
+
+.task-page{
+  max-width: 1440px;
+  margin: auto;
+  padding: 0 20px;
+}
+
+.task-edit-page{
+  max-width: 1440px;
+  margin: auto;
+  padding: 0 20px;
+}
+
+.task-text-area{
+  resize: none;
+  background-color: #121212;
+  border: none;
+  border-radius: 4px;
+  font-size: 18px;
+  padding: 6px 1%;
+  font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
+}
+
+.input-task-container{
+  width: 100%;
+  margin-top: 12px;
+  display: flex;
+  gap: 20px;
+  align-items: center;
+}
+
+.input-task-label{
+  min-width: 140px;
+}
+
+.custom-days {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
 }
 
 .hosts-page{

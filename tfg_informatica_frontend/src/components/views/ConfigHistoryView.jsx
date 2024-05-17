@@ -188,11 +188,11 @@ export const ConfigHistoryView = ({ activeView }) => {
           {fontSize: '16px',}}>Are you sure you want to restore this configuration?</p>
         <button 
           style={
-            {padding: '8px 16px', marginRight: '10px', borderRadius: '4px'}}
+            {padding: '8px 16px', marginRight: '10px'}}
           onClick={handleConfirmRestore} disabled={isLoading}>Yes</button>
         <button 
           style={
-            {padding: '8px 16px', marginRight: '10px', borderRadius: '4px'}}
+            {padding: '8px 16px', marginRight: '10px'}}
           onClick={handleCancelRestore} disabled={isLoading}>No</button>
       </Modal>
     </div>

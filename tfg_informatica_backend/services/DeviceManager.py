@@ -79,6 +79,7 @@ def execute_cli_commands(device_id, commands, is_config=False):
                 for command in commands:
                     output = net_connect.send_command(command, expect_string=r"#", read_timeout=60)
                     results[command] = output
+                    net_connect.save_config()
         return results, None
     except Exception as e:
         return None, str(e)
