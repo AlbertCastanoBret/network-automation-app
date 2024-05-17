@@ -24,7 +24,7 @@ const DeviceSubPage = ({ viewsConfig }) => {
                         return (
                             <ViewComponent
                                 key={view.id}
-                                activeView={view.activeView}
+                                activeView={view.id}
                                 config={view.componentConfig}
                             />
                         );

@@ -11,10 +11,9 @@ const TerminalView = ({ activeView }) => {
   const { deviceId } = queryString.parse(location.search);
 
   const handleCommandSubmit = async () => {
-    setError(''); // Clear any previous error
-    setResult(''); // Clear previous result
+    setError('');
+    setResult('');
 
-    // Validate commands format
     const commandList = commands.split(', ').filter(cmd => cmd.trim() !== '');
     if (!commandList.length || !commands.match(/^(\w+.*?, )*\w+.*?$/)) {
       setError('Invalid command format. Use comma and space to separate commands, e.g., "sh version, sh ip interface brief".');

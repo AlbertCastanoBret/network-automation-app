@@ -215,6 +215,7 @@ button:hover {
 }
 
 .icon-button:hover{
+  cursor: pointer;
   color: #646cff;
 }
 
@@ -331,6 +332,10 @@ button:hover {
 .terminal-input:focus,
 .terminal-input:hover{
   border: none;
+}
+
+.config-history-view {
+  width: 100%;
 }
 
 .hosts-page{

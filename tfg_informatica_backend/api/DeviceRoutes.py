@@ -1,7 +1,10 @@
 from flask import jsonify
 from flask import request
+from napalm import get_network_driver
 from services.DeviceManager import get_device_by_id, get_all_devices, get_device_status_for_device, \
-    get_arp_entries_for_device, get_interfaces_for_device, get_bgp_entries_for_device, execute_cli_commands
+    get_arp_entries_for_device, get_interfaces_for_device, get_bgp_entries_for_device, execute_cli_commands, \
+    set_backup_device_configuration, restore_device_configuration, compare_configurations, \
+    get_backup_configuration, get_backup_configurations_for_device, delete_backups
 from . import device_bp
 
 
@@ -61,3 +64,68 @@ def execute_commands(device_id):
         return jsonify({"error": error}), 500
     return jsonify(results)
 
+
+@device_bp.route('/backup/<string:backup_id>', methods=['GET'])
+def get_device_backup(backup_id):
+    backup = get_backup_configuration(backup_id)
+    if backup:
+        return jsonify(backup.to_dict())
+
+
+@device_bp.route('/backup/<int:device_id>', methods=['GET'])
+def get_device_backups(device_id):
+    device = get_device_by_id(device_id)
+    if not device:
+        return jsonify({"error": "Device not found"}), 400
+
+    backups = get_backup_configurations_for_device(device_id)
+    backups_list = [backup.to_dict() for backup in backups]
+    return jsonify(backups_list)
+
+
+@device_bp.route('/backup/<int:device_id>', methods=['POST'])
+def backup_device(device_id):
+    success, error = set_backup_device_configuration(device_id)
+    if success:
+        return jsonify({"message": "Backup successful"}), 200
+    else:
+        return jsonify({"error": error}), 400
+
+
+@device_bp.route('/backup/<int:device_id>', methods=['DELETE'])
+def delete_device_backups(device_id):
+    data = request.get_json()
+    backup_ids = data.get('backups', [])
+
+    if not backup_ids:
+        return jsonify({"error": "No backup IDs provided"}), 400
+
+    try:
+        delete_backups(device_id, backup_ids)
+        return jsonify({"message": "Backups deleted successfully"}), 200
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
+
+@device_bp.route('/restore/<int:device_id>/<string:backup_id>', methods=['POST'])
+def restore_device(device_id, backup_id):
+    success, error = restore_device_configuration(device_id, backup_id)
+    if success:
+        return jsonify({"message": "Restore successful"}), 200
+    else:
+        return jsonify({"error": error}), 400
+
+
+@device_bp.route('/compare/<int:device_id>/<string:backup_id>', methods=['GET'])
+def compare_device_configs(device_id, backup_id):
+    device = get_device_by_id(device_id)
+    backup = get_backup_configuration(backup_id)
+    if not device or not backup:
+        return jsonify({"error": "Device or backup not found"}), 400
+
+    driver = get_network_driver(device.os)
+    with driver(device.ip_address, device.username, device.password) as device_conn:
+        current_config = device_conn.get_config()['running']
+
+    diff = compare_configurations(current_config, backup.config)
+    return jsonify({"diff": diff}), 200

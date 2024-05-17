@@ -21,6 +21,7 @@ class Device(db.Model):
     hostname = db.Column(db.String(50), nullable=True)
     model = db.Column(db.String(100), nullable=True)
     os_version = db.Column(db.String(200), nullable=True)
+    device_type = db.Column(db.String(50), nullable=True)
     serial_number = db.Column(db.String(100), nullable=True)
     vendor = db.Column(db.String(50), nullable=True)
     uptime = db.Column(db.Float, nullable=True)

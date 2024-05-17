@@ -10,6 +10,7 @@ export const ConfigView = ({activeView}) => {
     const {deviceId} = queryString.parse(location.search);
 
     useEffect(() => {
+        setDevice('');
         if (activeView === 'config') {
         const loadData = async () => {
             try {

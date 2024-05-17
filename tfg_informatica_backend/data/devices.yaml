@@ -1,9 +1,10 @@
 - id: 1
-  ip_address: 192.168.0.32
+  ip_address: 192.168.0.36
   hostname: FirstRouter
   username: albert
   password: albert
   os: ios
+  device_type: cisco_xe
   # transport: napalm
   domain_name:
   mac_address:

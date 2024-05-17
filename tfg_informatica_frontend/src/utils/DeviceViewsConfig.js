@@ -3,6 +3,7 @@ import { FactsView } from '../components/views/FactsView';
 import { ConfigView } from '../components/views/ConfigView';
 import { TableView } from '../components/views/TableView';
 import TerminalView from '../components/views/TerminalView';
+import { ConfigHistoryView } from '../components/views/ConfigHistoryView';
 
 export const arpConfig = {
     viewId: 'arp-table',
@@ -96,15 +97,29 @@ export const bgpNeighborsConfig = {
     })
 };
 
+export const configHistoryConfig = {
+    viewId: 'config-history-table',
+    apiUrl: '/devices/backup/:deviceId',
+    title: 'Configuration History',
+    columns: [
+        { title: 'Date', field: 'date' },
+        { title: 'Restore', field: 'restore' }
+    ],
+    mapFunc: configHistoryRow => ({
+        date: configHistoryRow.timestamp ?? 'N/A',
+    })
+}
+
 export const deviceDataConfig = [
-    { id: 'status', label: 'Status', component: ChartsView, activeView: "status" },
-    { id: 'facts', label: 'Facts', component: FactsView, activeView: "facts"},
-    { id: 'arp-table', label: 'ARP Table', component: TableView, activeView: "arp-table", componentConfig: arpConfig},
-    { id: 'interfaces-table', label: 'Interfaces', component: TableView, activeView: "interfaces-table", componentConfig: interfacesConfig},
-    { id: 'bgp-neighbors-table', label: 'BGP', component: TableView, activeView: "bgp-neighbors-table", componentConfig: bgpNeighborsConfig}
+    { id: 'status', label: 'Status', component: ChartsView},
+    { id: 'facts', label: 'Facts', component: FactsView},
+    { id: 'arp-table', label: 'ARP Table', component: TableView, componentConfig: arpConfig},
+    { id: 'interfaces-table', label: 'Interfaces', component: TableView, componentConfig: interfacesConfig},
+    { id: 'bgp-neighbors-table', label: 'BGP', component: TableView, componentConfig: bgpNeighborsConfig}
 ];
 
 export const deviceConfigurationConfig = [
-    { id: 'config', label: 'Configuration', component: ConfigView, activeView: "config" },
-    { id: 'terminal' , label: 'Terminal', component: TerminalView, activeView: "terminal"}
+    { id: 'config', label: 'Configuration', component: ConfigView},
+    { id: 'terminal' , label: 'Terminal', component: TerminalView},
+    { id: 'config-history' , label: 'Configuration History', component: ConfigHistoryView}
 ];

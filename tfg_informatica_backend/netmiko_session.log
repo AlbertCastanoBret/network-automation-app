@@ -5,11 +5,183 @@ FirstRouter#
 FirstRouter#terminal width 511
 FirstRouter#terminal length 0
 FirstRouter#
-FirstRouter#conf t
+FirstRouter#
+FirstRouter#configure terminal
 Enter configuration commands, one per line.  End with CNTL/Z.
-FirstRouter(config)#interface gig1
-FirstRouter(config-if)#
-FirstRouter(config-if)#
-FirstRouter(config-if)#end
+FirstRouter(config)#
+FirstRouter(config)#!
+FirstRouter(config)#
+FirstRouter(config)#
+FirstRouter(config)#!
+FirstRouter(config)#version 16.3
+FirstRouter(config)#service timestamps debug datetime msec
+FirstRouter(config)#service timestamps log datetime msec
+FirstRouter(config)#no platform punt-keepalive disable-kernel-core
+FirstRouter(config)#platform console auto
+FirstRouter(config)#!
+FirstRouter(config)#hostname FirstRouter
+FirstRouter(config)#!
+FirstRouter(config)#boot-start-marker
+FirstRouter(config)#boot-end-marker
+FirstRouter(config)#!
+FirstRouter(config)#!
+FirstRouter(config)#!
+FirstRouter(config)#no aaa new-model
+FirstRouter(config)#!
+FirstRouter(config)#!
+FirstRouter(config)#!
+FirstRouter(config)#!
+FirstRouter(config)#!
+FirstRouter(config)#!
+FirstRouter(config)#!
+FirstRouter(config)#!
+FirstRouter(config)#!
+FirstRouter(config)#ip domain name ********quokka.com
+FirstRouter(config)#!
+FirstRouter(config)#!
+FirstRouter(config)#!
+FirstRouter(config)#!
+FirstRouter(config)#!
+FirstRouter(config)#!
+FirstRouter(config)#!
+FirstRouter(config)#!
+FirstRouter(config)#!
+FirstRouter(config)#!
+FirstRouter(config)#subscriber templating
+A system RELOAD is required before templating state change
+FirstRouter(config)#!
+FirstRouter(config)#!
+FirstRouter(config)#!
+FirstRouter(config)#multilink bundle-name authenticated
+FirstRouter(config)#!
+FirstRouter(config)#!
+FirstRouter(config)#!
+FirstRouter(config)#!
+FirstRouter(config)#!
+FirstRouter(config)#crypto pki trustpoint TP-self-signed-2458469978
+FirstRouter(ca-trustpoint)# enrollment selfsigned
+FirstRouter(ca-trustpoint)# subject-name cn=IOS-Self-Signed-Certificate-2458469978
+FirstRouter(ca-trustpoint)# revocation-check none
+FirstRouter(ca-trustpoint)# rsakeypair TP-self-signed-2458469978
+FirstRouter(ca-trustpoint)#!
+FirstRouter(ca-trustpoint)#!
+FirstRouter(ca-trustpoint)#crypto pki certificate chain TP-self-signed-2458469978
+FirstRouter(config-cert-chain)#!
+FirstRouter(config-cert-chain)#!
+FirstRouter(config-cert-chain)#!
+FirstRouter(config-cert-chain)#!
+FirstRouter(config-cert-chain)#!
+FirstRouter(config-cert-chain)#!
+FirstRouter(config-cert-chain)#!
+FirstRouter(config-cert-chain)#!
+FirstRouter(config-cert-chain)#license udi pid CSR1000V sn 9C1M3A8N3UB
+FirstRouter(config)#diagnostic bootup level minimal
+FirstRouter(config)#!
+FirstRouter(config)#spanning-tree extend system-id
+FirstRouter(config)#!
+FirstRouter(config)#!
+FirstRouter(config)#username ******** privilege 15 secret 5 $1$o8gx$YHYUlVtF0k3qkxhhU7wMD.
+FirstRouter(config)#!
+FirstRouter(config)#redundancy
+FirstRouter(config-red)#!
+FirstRouter(config-red)#!
+FirstRouter(config-red)#!
+FirstRouter(config-red)#!
+FirstRouter(config-red)#!
+FirstRouter(config-red)#!
+FirstRouter(config-red)#!
+FirstRouter(config-red)#!
+FirstRouter(config-red)#!
+FirstRouter(config-red)#!
+FirstRouter(config-red)#!
+FirstRouter(config-red)#!
+FirstRouter(config-red)#!
+FirstRouter(config-red)#!
+FirstRouter(config-red)#!
+FirstRouter(config-red)#!
+FirstRouter(config-red)#!
+FirstRouter(config-red)#!
+FirstRouter(config-red)#!
+FirstRouter(config-red)#!
+FirstRouter(config-red)#!
+FirstRouter(config-red)#!
+FirstRouter(config-red)#!
+FirstRouter(config-red)#!
+FirstRouter(config-red)#!
+FirstRouter(config-red)#!
+FirstRouter(config-red)#!
+FirstRouter(config-red)#interface GigabitEthernet1
+FirstRouter(config-if)# description hola
+FirstRouter(config-if)# ip address dhcp
+FirstRouter(config-if)# negotiation auto
+FirstRouter(config-if)# no mop enabled
+FirstRouter(config-if)# no mop sysid
+FirstRouter(config-if)#!
+FirstRouter(config-if)#interface GigabitEthernet2
+FirstRouter(config-if)# ip address dhcp
+FirstRouter(config-if)# negotiation auto
+FirstRouter(config-if)# no mop enabled
+FirstRouter(config-if)# no mop sysid
+FirstRouter(config-if)#!
+FirstRouter(config-if)#interface GigabitEthernet3
+FirstRouter(config-if)# no ip address
+FirstRouter(config-if)# shutdown
+FirstRouter(config-if)# negotiation auto
+FirstRouter(config-if)# no mop enabled
+FirstRouter(config-if)# no mop sysid
+FirstRouter(config-if)#!
+FirstRouter(config-if)#!
+FirstRouter(config-if)#virtual-service csr_mgmt
+FirstRouter(config-virt-serv)#!
+FirstRouter(config-virt-serv)#ip forward-protocol nd
+FirstRouter(config)#ip http server
+FirstRouter(config)#ip http authentication local
+FirstRouter(config)#ip http secure-server
+Failed to generate persistent self-signed certificate.
+    Secure server will use temporary self-signed certificate.
+
+FirstRouter(config)#ip http client source-interface GigabitEthernet2
+FirstRouter(config)#!
+FirstRouter(config)#ip tftp source-interface GigabitEthernet2
+FirstRouter(config)#ip ssh version 2
+FirstRouter(config)#!
+FirstRouter(config)#!
+FirstRouter(config)#!
+FirstRouter(config)#!
+FirstRouter(config)#!
+FirstRouter(config)#!
+FirstRouter(config)#control-plane
+FirstRouter(config-cp)#!
+FirstRouter(config-cp)# !
+FirstRouter(config-cp)# !
+FirstRouter(config-cp)# !
+FirstRouter(config-cp)# !
+FirstRouter(config-cp)#!
+FirstRouter(config-cp)#!
+FirstRouter(config-cp)#!
+FirstRouter(config-cp)#!
+FirstRouter(config-cp)#!
+FirstRouter(config-cp)#line con 0
+FirstRouter(config-line)# stopbits 1
+FirstRouter(config-line)#line vty 0 4
+FirstRouter(config-line)# login local
+FirstRouter(config-line)# transport input ssh
+FirstRouter(config-line)#!
+FirstRouter(config-line)#ntp server 34.208.249.133
+FirstRouter(config)#!
+FirstRouter(config)#!
+FirstRouter(config)#!
+FirstRouter(config)#!
+FirstRouter(config)#!
+FirstRouter(config)#!
+FirstRouter(config)#pnp profile pnp_cco_profile
+FirstRouter(config-pnp-init)# transport https ipv4 34.192.246.10 port 443
+FirstRouter(config-pnp-init)#end
+FirstRouter#
+FirstRouter#
+FirstRouter#
+FirstRouter#write mem
+Building configuration...
+[OK]
 FirstRouter#
 FirstRouter#exit
