@@ -3,7 +3,7 @@ import { Chart as ChartJS, CategoryScale, LinearScale, PointElement, LineElement
 import React, { useEffect, useState } from 'react'
 import { useLocation } from 'react-router-dom';
 import { fetchData } from '../../utils/fetchData';
-import { Chart } from '../deviceData/Chart';
+import { LineChart } from '../deviceData/LineChart';
 
 ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend);
 
@@ -102,10 +102,10 @@ export const ChartsView = ({activeView}) => {
     <div className="charts-view view" style={{ display: activeView === 'status' ? 'block' : 'none' }}>
         <h2> Status</h2> 
         <div className="charts-container">
-            <Chart chartData={responseTimeData} title="Response Time" min={1} max={3}></Chart>
-            <Chart chartData={cpuData} title="CPU Usage" min={0} max={100}></Chart>
-            <Chart chartData={memoryData} title="Memory Usage" min={0} max={100}></Chart>
-            <Chart chartData={statusData} title="Status" min={0} max={1} limitTicksToValues={[0, 1]}></Chart>
+            <LineChart chartData={responseTimeData} title="Response Time" min={1} max={3}></LineChart>
+            <LineChart chartData={cpuData} title="CPU Usage" min={0} max={1}></LineChart>
+            <LineChart chartData={memoryData} title="Memory Usage" min={0} max={100}></LineChart>
+            <LineChart chartData={statusData} title="Status" min={0} max={1} limitTicksToValues={[0, 1]}></LineChart>
         </div>
     </div>
   )

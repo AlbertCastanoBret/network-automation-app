@@ -40,6 +40,10 @@ def get_device_status_for_device(device_id):
     return DeviceStatus.query.filter_by(device_id=device_id).order_by(DeviceStatus.timestamp).all()
 
 
+def get_all_device_statuses():
+    return DeviceStatus.query.all()
+
+
 def get_arp_entries_for_device(device_id):
     return DeviceArpEntry.query.filter_by(device_id=device_id).all()
 

@@ -154,6 +154,12 @@ button:hover {
   display: none;
 }
 
+.home-page{
+  max-width: 1440px;
+  margin: auto;
+  padding: 0 20px;
+}
+
 .devices-page{
   max-width: 1440px;
   margin: auto;

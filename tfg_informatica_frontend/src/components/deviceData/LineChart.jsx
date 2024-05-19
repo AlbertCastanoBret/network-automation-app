@@ -1,7 +1,7 @@
 import React from 'react'
 import { Line } from 'react-chartjs-2';
 
-export const Chart = ({ chartData, title, min, max, limitTicksToValues }) => {
+export const LineChart = ({ chartData, title, min, max, limitTicksToValues }) => {
   const options = {
     responsive: true,
     plugins: {
@@ -12,7 +12,7 @@ export const Chart = ({ chartData, title, min, max, limitTicksToValues }) => {
             display: true,
             text: title,
             font: {
-                size: 16,
+                size: 18,
             },
             color: 'rgb(255, 255, 255)',
         }

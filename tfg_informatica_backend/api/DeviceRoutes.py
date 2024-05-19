@@ -4,7 +4,7 @@ from napalm import get_network_driver
 from services.DeviceManager import get_device_by_id, get_all_devices, get_device_status_for_device, \
     get_arp_entries_for_device, get_interfaces_for_device, get_bgp_entries_for_device, execute_cli_commands, \
     set_backup_device_configuration, restore_device_configuration, compare_configurations, \
-    get_backup_configuration, get_backup_configurations_for_device, delete_backups
+    get_backup_configuration, get_backup_configurations_for_device, delete_backups, get_all_device_statuses
 from . import device_bp
 
 
@@ -23,12 +23,18 @@ def get_devices():
     return jsonify(devices_list), 200
 
 
-
 @device_bp.route('/status/<int:device_id>', methods=['GET'])
 def get_device_status(device_id):
     device_status = get_device_status_for_device(device_id)
     device_status_list = [status.to_dict() for status in device_status]
     return jsonify(device_status_list), 200
+
+
+@device_bp.route('/status', methods=['GET'])
+def get_all_device_status():
+    device_statuses = get_all_device_statuses()
+    device_statuses_list = [device.to_dict() for device in device_statuses]
+    return jsonify(device_statuses_list), 200
 
 
 @device_bp.route('/arp_table/<int:device_id>', methods=['GET'])
