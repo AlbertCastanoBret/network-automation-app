@@ -5,179 +5,75 @@ FirstRouter#
 FirstRouter#terminal width 511
 FirstRouter#terminal length 0
 FirstRouter#
+FirstRouter#sh ip int brief
+Interface              IP-Address      OK? Method Status                Protocol
+GigabitEthernet1       192.168.0.30    YES DHCP   up                    up      
+GigabitEthernet2       unassigned      YES DHCP   up                    up      
+GigabitEthernet3       unassigned      YES unset  administratively down down    
 FirstRouter#
-FirstRouter#configure terminal
-Enter configuration commands, one per line.  End with CNTL/Z.
-FirstRouter(config)#
-FirstRouter(config)#!
-FirstRouter(config)#
-FirstRouter(config)#
-FirstRouter(config)#!
-FirstRouter(config)#version 16.3
-FirstRouter(config)#service timestamps debug datetime msec
-FirstRouter(config)#service timestamps log datetime msec
-FirstRouter(config)#no platform punt-keepalive disable-kernel-core
-FirstRouter(config)#platform console auto
-FirstRouter(config)#!
-FirstRouter(config)#hostname FirstRouter
-FirstRouter(config)#!
-FirstRouter(config)#boot-start-marker
-FirstRouter(config)#boot-end-marker
-FirstRouter(config)#!
-FirstRouter(config)#!
-FirstRouter(config)#!
-FirstRouter(config)#no aaa new-model
-FirstRouter(config)#!
-FirstRouter(config)#!
-FirstRouter(config)#!
-FirstRouter(config)#!
-FirstRouter(config)#!
-FirstRouter(config)#!
-FirstRouter(config)#!
-FirstRouter(config)#!
-FirstRouter(config)#!
-FirstRouter(config)#ip domain name ********quokka.com
-FirstRouter(config)#!
-FirstRouter(config)#!
-FirstRouter(config)#!
-FirstRouter(config)#!
-FirstRouter(config)#!
-FirstRouter(config)#!
-FirstRouter(config)#!
-FirstRouter(config)#!
-FirstRouter(config)#!
-FirstRouter(config)#!
-FirstRouter(config)#subscriber templating
-A system RELOAD is required before templating state change
-FirstRouter(config)#!
-FirstRouter(config)#!
-FirstRouter(config)#!
-FirstRouter(config)#multilink bundle-name authenticated
-FirstRouter(config)#!
-FirstRouter(config)#!
-FirstRouter(config)#!
-FirstRouter(config)#!
-FirstRouter(config)#!
-FirstRouter(config)#crypto pki trustpoint TP-self-signed-2458469978
-FirstRouter(ca-trustpoint)# enrollment selfsigned
-FirstRouter(ca-trustpoint)# subject-name cn=IOS-Self-Signed-Certificate-2458469978
-FirstRouter(ca-trustpoint)# revocation-check none
-FirstRouter(ca-trustpoint)# rsakeypair TP-self-signed-2458469978
-FirstRouter(ca-trustpoint)#!
-FirstRouter(ca-trustpoint)#!
-FirstRouter(ca-trustpoint)#crypto pki certificate chain TP-self-signed-2458469978
-FirstRouter(config-cert-chain)#!
-FirstRouter(config-cert-chain)#!
-FirstRouter(config-cert-chain)#!
-FirstRouter(config-cert-chain)#!
-FirstRouter(config-cert-chain)#!
-FirstRouter(config-cert-chain)#!
-FirstRouter(config-cert-chain)#!
-FirstRouter(config-cert-chain)#!
-FirstRouter(config-cert-chain)#license udi pid CSR1000V sn 9C1M3A8N3UB
-FirstRouter(config)#diagnostic bootup level minimal
-FirstRouter(config)#!
-FirstRouter(config)#spanning-tree extend system-id
-FirstRouter(config)#!
-FirstRouter(config)#!
-FirstRouter(config)#username ******** privilege 15 secret 5 $1$o8gx$YHYUlVtF0k3qkxhhU7wMD.
-FirstRouter(config)#!
-FirstRouter(config)#redundancy
-FirstRouter(config-red)#!
-FirstRouter(config-red)#!
-FirstRouter(config-red)#!
-FirstRouter(config-red)#!
-FirstRouter(config-red)#!
-FirstRouter(config-red)#!
-FirstRouter(config-red)#!
-FirstRouter(config-red)#!
-FirstRouter(config-red)#!
-FirstRouter(config-red)#!
-FirstRouter(config-red)#!
-FirstRouter(config-red)#!
-FirstRouter(config-red)#!
-FirstRouter(config-red)#!
-FirstRouter(config-red)#!
-FirstRouter(config-red)#!
-FirstRouter(config-red)#!
-FirstRouter(config-red)#!
-FirstRouter(config-red)#!
-FirstRouter(config-red)#!
-FirstRouter(config-red)#!
-FirstRouter(config-red)#!
-FirstRouter(config-red)#!
-FirstRouter(config-red)#!
-FirstRouter(config-red)#!
-FirstRouter(config-red)#!
-FirstRouter(config-red)#!
-FirstRouter(config-red)#interface GigabitEthernet1
-FirstRouter(config-if)# description hola
-FirstRouter(config-if)# ip address dhcp
-FirstRouter(config-if)# negotiation auto
-FirstRouter(config-if)# no mop enabled
-FirstRouter(config-if)# no mop sysid
-FirstRouter(config-if)#!
-FirstRouter(config-if)#interface GigabitEthernet2
-FirstRouter(config-if)# ip address dhcp
-FirstRouter(config-if)# negotiation auto
-FirstRouter(config-if)# no mop enabled
-FirstRouter(config-if)# no mop sysid
-FirstRouter(config-if)#!
-FirstRouter(config-if)#interface GigabitEthernet3
-FirstRouter(config-if)# no ip address
-FirstRouter(config-if)# shutdown
-FirstRouter(config-if)# negotiation auto
-FirstRouter(config-if)# no mop enabled
-FirstRouter(config-if)# no mop sysid
-FirstRouter(config-if)#!
-FirstRouter(config-if)#!
-FirstRouter(config-if)#virtual-service csr_mgmt
-FirstRouter(config-virt-serv)#!
-FirstRouter(config-virt-serv)#ip forward-protocol nd
-FirstRouter(config)#ip http server
-FirstRouter(config)#ip http authentication local
-FirstRouter(config)#ip http secure-server
-Failed to generate persistent self-signed certificate.
-    Secure server will use temporary self-signed certificate.
+FirstRouter#
+FirstRouter#write mem
+Building configuration...
+[OK]
+FirstRouter#sh version
+Cisco IOS XE Software, Version 16.03.09
+Cisco IOS Software [Denali], CSR1000V Software (X86_64_LINUX_IOSD-UNIVERSALK9-M), Version 16.3.9, RELEASE SOFTWARE (fc4)
+Technical Support: http://www.cisco.com/techsupport
+Copyright (c) 1986-2019 by Cisco Systems, Inc.
+Compiled Mon 29-Jul-19 13:38 by mcpre
 
-FirstRouter(config)#ip http client source-interface GigabitEthernet2
-FirstRouter(config)#!
-FirstRouter(config)#ip tftp source-interface GigabitEthernet2
-FirstRouter(config)#ip ssh version 2
-FirstRouter(config)#!
-FirstRouter(config)#!
-FirstRouter(config)#!
-FirstRouter(config)#!
-FirstRouter(config)#!
-FirstRouter(config)#!
-FirstRouter(config)#control-plane
-FirstRouter(config-cp)#!
-FirstRouter(config-cp)# !
-FirstRouter(config-cp)# !
-FirstRouter(config-cp)# !
-FirstRouter(config-cp)# !
-FirstRouter(config-cp)#!
-FirstRouter(config-cp)#!
-FirstRouter(config-cp)#!
-FirstRouter(config-cp)#!
-FirstRouter(config-cp)#!
-FirstRouter(config-cp)#line con 0
-FirstRouter(config-line)# stopbits 1
-FirstRouter(config-line)#line vty 0 4
-FirstRouter(config-line)# login local
-FirstRouter(config-line)# transport input ssh
-FirstRouter(config-line)#!
-FirstRouter(config-line)#ntp server 34.208.249.133
-FirstRouter(config)#!
-FirstRouter(config)#!
-FirstRouter(config)#!
-FirstRouter(config)#!
-FirstRouter(config)#!
-FirstRouter(config)#!
-FirstRouter(config)#pnp profile pnp_cco_profile
-FirstRouter(config-pnp-init)# transport https ipv4 34.192.246.10 port 443
-FirstRouter(config-pnp-init)#end
-FirstRouter#
+
+Cisco IOS-XE software, Copyright (c) 2005-2019 by cisco Systems, Inc.
+All rights reserved.  Certain components of Cisco IOS-XE software are
+licensed under the GNU General Public License ("GPL") Version 2.0.  The
+software code licensed under GPL Version 2.0 is free software that comes
+with ABSOLUTELY NO WARRANTY.  You can redistribute and/or modify such
+GPL code under the terms of GPL Version 2.0.  For more details, see the
+documentation or "License Notice" file accompanying the IOS-XE software,
+or the applicable URL provided on the flyer accompanying the IOS-XE
+software.
+
+
+ROM: IOS-XE ROMMON
+
+FirstRouter uptime is 16 hours, 49 minutes
+Uptime for this control processor is 16 hours, 49 minutes
+System returned to ROM by reload
+System restarted at 07:27:51 UTC Sat May 18 2024
+System image file is "bootflash:packages.conf"
+Last reload reason: Unknown reason
+
+
+
+This product contains cryptographic features and is subject to United
+States and local country laws governing import, export, transfer and
+use. Delivery of Cisco cryptographic products does not imply
+third-party authority to import, export, distribute or use encryption.
+Importers, exporters, distributors and users are responsible for
+compliance with U.S. and local country laws. By using this product you
+agree to comply with applicable laws and regulations. If you are unable
+to comply with U.S. and local laws, return this product immediately.
+
+A summary of U.S. laws governing Cisco cryptographic products may be found at:
+http://www.cisco.com/wwl/export/crypto/tool/stqrg.html
+
+If you require further assistance please contact us by sending email to
+export@cisco.com.
+
+License Level: ax
+License Type: Default. No valid license found.
+Next reload license Level: ax
+
+cisco CSR1000V (VXE) processor (revision VXE) with 2253397K/3075K bytes of memory.
+Processor board ID 9C1M3A8N3UB
+3 Gigabit Ethernet interfaces
+32768K bytes of non-volatile configuration memory.
+8112560K bytes of physical memory.
+7774207K bytes of virtual hard disk at bootflash:.
+0K bytes of  at webui:.
+
+Configuration register is 0x2102
+
 FirstRouter#
 FirstRouter#
 FirstRouter#write mem

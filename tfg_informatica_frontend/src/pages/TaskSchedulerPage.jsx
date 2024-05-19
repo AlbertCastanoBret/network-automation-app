@@ -1,24 +1,47 @@
-import React from 'react'
+import React, { useEffect, useState } from 'react'
 import { Table } from '../components/common/Table'
 import { NavLink } from 'react-router-dom';
+import { fetchData } from '../utils/fetchData';
 
 export const TaskSchedulerPage = () => {
 
+  const [taskData, setTaskData] = useState([])
 
-    const columns = [
-        { title: 'Id', field: 'id' },
-        { title: 'Name', field: 'name' },
-        { title: 'Data', field: 'date' },
-        { title: 'Edit', field: 'edit' },
-    ];
+  useEffect(() => {
+    const loadData = async () => {
+      const apiData = await fetchData('/task-scheduler');
+      const mappedData = apiData.map((task) => ({
+        id: task.id,
+        device_id: task.device_id,
+        name: task.name,
+        time: task.execution_time,
+        day_interval: task.repeat_interval,
+        week_interval: task.days_of_week
+      }));
+      setTaskData(mappedData);
+    };
 
-    const data = [
-        { id: 1, name: 'Task 1', date: '2021-10-10' },
-        { id: 2, name: 'Task 2', date: '2021-10-11' },
-        { id: 3, name: 'Task 3', date: '2021-10-12' },
-        { id: 4, name: 'Task 4', date: '2021-10-13' },
-        { id: 5, name: 'Task 5', date: '2021-10-14' },
-    ]
+    loadData();
+
+    const intervalId = setInterval(() => {
+      loadData();
+    }, 30000)
+
+    return () => {
+      clearInterval(intervalId);
+    }
+  }, []); 
+
+  const columns = [
+    { title: 'Id', field: 'id'},
+    { title: 'Device Id', field: 'device_id'},
+    { title: 'Name', field: 'name' },
+    { title: 'Execution Time', field: 'time' },
+    { title: 'Day Interval (Minutes)', field: 'day_interval'},
+    { title: 'Week Interval', field: 'week_interval'},
+    { title: 'Last Execution Time', field: 'last_time'},
+    { title: 'Results', field: 'results'}
+  ];
 
   return (
     <div className="task-page">
@@ -31,7 +54,7 @@ export const TaskSchedulerPage = () => {
             </button>
         </NavLink>
       </div>
-      <Table columns={columns} data={data}></Table>
+      <Table columns={columns} data={taskData}></Table>
     </div>
   )
 }

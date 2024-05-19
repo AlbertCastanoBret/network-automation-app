@@ -1,31 +1,23 @@
-import socket
 import threading
-from ipaddress import ip_network
-
 from flask import Flask
-from napalm import get_network_driver
-from netmiko import ConnectHandler
-from scapy.layers.inet import ICMP, IP
-from scapy.layers.l2 import ARP, Ether
-from scapy.sendrecv import srp
 
 from flask_cors import CORS
 import asyncio
-import scapy.all as s
 
 app = Flask(__name__)
 CORS(app)
 
 from flask_sqlalchemy import SQLAlchemy
 
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///database.db'
+app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///database.db?timeout=20'
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 db = SQLAlchemy(app)
 
-from api import device_bp, host_bp
+from api import device_bp, task_scheduler_bp, host_bp
 
 app.register_blueprint(device_bp, url_prefix='/devices')
 app.register_blueprint(host_bp, url_prefix='/hosts')
+app.register_blueprint(task_scheduler_bp, url_prefix='/task-scheduler')
 
 
 def run_flask_app():
@@ -37,16 +29,17 @@ async def run_async_tasks():
     task_manager = AsyncTaskManager()
     try:
         await asyncio.gather(
-            task_manager.monitor_devices(10),
-            task_manager.monitor_hosts(5),
+            task_manager.monitor_devices(30),
+            task_manager.monitor_hosts(20),
         )
     except asyncio.CancelledError:
         print("Cancelled tasks.")
     except KeyboardInterrupt:
         print("Tasks manually interrupted.")
 
-from models.Host import Host
 from services.DeviceManager import import_devices_from_file
+from services.TaskManager import *
+from models.Host import Host
 with app.app_context():
     db.create_all()
     import_devices_from_file(filename="devices", filetype="yaml")

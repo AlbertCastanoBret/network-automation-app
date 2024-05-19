@@ -41,6 +41,7 @@ class Device(db.Model):
     interfaces = db.relationship('DeviceInterface', backref='device', lazy=True)
     bgp_neighbors = db.relationship('DeviceBgpNeighbor', backref='device', lazy=True)
     device_configs = db.relationship('DeviceConfig', backref='device', lazy=True)
+    tasks = db.relationship('DeviceTask', backref='device', lazy=True)
 
     def to_dict(self):
         return {c.name: getattr(self, c.name) for c in self.__table__.columns}

@@ -1,20 +1,27 @@
 import React, { useEffect, useState } from 'react';
 import { fetchData } from '../utils/fetchData';
 import { Table } from '../components/common/Table';
+import Modal from 'react-modal';
+import { useNavigate } from 'react-router-dom';
+
+Modal.setAppElement('#root');
 
 export const TaskEdit = () => {
-
-  const [name, setName] = useState('')
+  const [name, setName] = useState('');
   const [commands, setCommands] = useState('');
   const [time, setTime] = useState('');
   const [repeat, setRepeat] = useState(false);
-  const [repeatInterval, setRepeatInterval] = useState('');
+  const [repeatInterval, setRepeatInterval] = useState(0);
   const [customInterval, setCustomInterval] = useState('');
   const [weekRepeat, setWeekRepeat] = useState(false);
-  const [weekRepeatInterval, setWeekRepeatInterval] = useState('once');
+  const [weekRepeatInterval, setWeekRepeatInterval] = useState('Once');
   const [customDays, setCustomDays] = useState([]);
   const [devicesData, setDevices] = useState([]);
   const [selectedDevices, setSelectedDevices] = useState([]);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [modalMessage, setModalMessage] = useState('');
+
+  const navigate = useNavigate();
 
   useEffect(() => {
     const loadData = async () => {
@@ -51,40 +58,54 @@ export const TaskEdit = () => {
   const handleRepeatChange = (e) => {
     setRepeat(e.target.checked);
     if (e.target.checked == true) {
-      setRepeatInterval('30 minutes');
+      setRepeatInterval(30);
     }
     else {
-      setRepeatInterval('');
+      setRepeatInterval(0);
       setCustomInterval('');
     }
   };
 
   const handleRepeatIntervalChange = (e) => {
     setRepeatInterval(e.target.value);
-    if (e.target.value !== 'custom') {
+    if (e.target.value !== 'Custom') {
       setCustomInterval('');
     }
   };
 
   const handleCustomIntervalChange = (e) => {
-    setCustomInterval(e.target.value);
+    const value = e.target.value;
+
+    if (value === '') {
+        setCustomInterval(value);
+        return;
+    }
+
+    if (!isNaN(value) && Number.isInteger(parseFloat(value))) {
+        const numericValue = parseInt(value, 10);
+        if (numericValue <= 0) {
+            setCustomInterval(1);
+        } else {
+            setCustomInterval(numericValue);
+        }
+    }
   };
 
   const handleWeekRepeatChange = (e) => {
     setWeekRepeat(e.target.checked);
     if (e.target.checked === true) {
-      setWeekRepeatInterval('daily');
+      setWeekRepeatInterval('Daily');
       setCustomDays([]);
     }
     else {
-      setWeekRepeatInterval('');
+      setWeekRepeatInterval('Once');
       setCustomDays([]);
     }
   };
 
   const handleWeekRepeatIntervalChange = (e) => {
     setWeekRepeatInterval(e.target.value);
-    if (e.target.value !== 'custom') {
+    if (e.target.value !== 'Custom') {
       setCustomDays([]);
     }
   };
@@ -108,6 +129,66 @@ export const TaskEdit = () => {
     } else {
       setSelectedDevices(selectedDevices.filter(deviceId => deviceId !== id));
     }
+  };
+
+  const handleSave = async () => {
+    if (!name || !commands || !time || selectedDevices.length === 0 || repeatInterval === 'Custom' && customInterval === '' || weekRepeatInterval === 'Custom' && customDays.length === 0) {
+      setModalMessage('Please fill in all required fields and select at least one device.');
+      setIsModalOpen(true);
+      return;
+    }
+
+    const taskData = {
+      name,
+      commands,
+      time,
+      repeat,
+      repeatInterval,
+      customInterval,
+      weekRepeat,
+      weekRepeatInterval,
+      customDays,
+      selectedDevices,
+    };
+
+    try {
+      console.log(JSON.stringify(taskData));
+      const response = await fetch(`${import.meta.env.VITE_BACKEND_URL}/task-scheduler`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(taskData),
+      });
+
+      if (response.ok) {
+        navigate('/task-scheduler');
+        console.log('Task saved successfully');
+      } else {
+        console.log('Failed to save task');
+      }
+    } catch (error) {
+      console.error('Error saving task:', error);
+    }
+  };
+
+  const customStyles = {
+    overlay: {
+      backgroundColor: 'rgba(0, 0, 0, 0.75)',
+    },
+    content: {
+      top: '50%',
+      left: '50%',
+      right: 'auto',
+      bottom: 'auto',
+      marginRight: '-50%',
+      transform: 'translate(-50%, -50%)',
+      backgroundColor: '#282c34',
+      color: '#fff', 
+      padding: '20px', 
+      borderRadius: '8px', 
+      border: '1px solid #9ca1fc', 
+    },
   };
 
   return (
@@ -170,15 +251,15 @@ export const TaskEdit = () => {
             className="terminal-input" 
             style={{width: 'auto', fontSize: '18px', minWidth: '110px', maxWidth: '180px'}}
           >
-            <option value="30 minutes">Every 30 minutes</option>
-            <option value="1 hour">Every hour</option>
-            <option value="2 hours">Every 2 hours</option>
-            <option value="3 hours">Every 3 hours</option>
-            <option value="custom">Custom</option>
+            <option value={30}>Every 30 minutes</option>
+            <option value={60}>Every hour</option>
+            <option value={120}>Every 2 hours</option>
+            <option value={180}>Every 3 hours</option>
+            <option value="Custom">Custom</option>
           </select>
         </div>
       )}
-      {repeat && repeatInterval === 'custom' && (
+      {repeat && repeatInterval === 'Custom' && (
         <div className="input-task-container">
           <strong htmlFor="customInterval" className='input-task-label'>Custom (minutes):</strong>
           <input 
@@ -217,13 +298,13 @@ export const TaskEdit = () => {
             className="terminal-input" 
             style={{width: 'auto', fontSize: '18px', minWidth: '110px', maxWidth: '180px'}}
           >
-            <option value="daily">Daily</option>
-            <option value="weekdays">Mon to Fri</option>
-            <option value="custom">Custom</option>
+            <option value="Daily">Daily</option>
+            <option value="Weekdays">Mon to Fri</option>
+            <option value="Custom">Custom</option>
           </select>
         </div>
       )}
-      {weekRepeat && weekRepeatInterval === 'custom' && (
+      {weekRepeat && weekRepeatInterval === 'Custom' && (
         <div className="input-task-container">
           <strong className='input-task-label' style={{alignSelf: 'start'}}>Custom Days:</strong>
           <div className="custom-days" style={{fontSize: '18px'}}>
@@ -244,7 +325,20 @@ export const TaskEdit = () => {
       )}
       <h2 style={{marginTop: '40px'}}>Devices</h2>
       <Table columns={columns} data={devicesData} onSelect={handleDeviceSelection}></Table>
-      <button onClick={() => console.log('Save Task')} style={{padding: '8px 16px', marginTop: '20px'}}>Save Task</button>
+      <button onClick={handleSave} style={{padding: '8px 16px', marginTop: '20px'}}>Save Task</button>
+      
+      <Modal
+        isOpen={isModalOpen}
+        onRequestClose={() => setIsModalOpen(false)}
+        contentLabel="Validation Error"
+        style={customStyles}
+        shouldCloseOnOverlayClick={true}
+        shouldCloseOnEsc={true}
+      >
+        <strong style={{ fontSize: '18px', color: '#9ca1fc' }}>Validation Error</strong>
+        <p style={{ fontSize: '16px' }}>{modalMessage}</p>
+        <button style={{ padding: '8px 16px', marginRight: '10px' }} onClick={() => setIsModalOpen(false)}>OK</button>
+      </Modal>
     </div>
   );
 };

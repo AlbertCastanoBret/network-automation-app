@@ -14,7 +14,10 @@ import difflib
 
 def import_devices_from_file(filename, filetype):
     with app.app_context():
+        db.session.begin()
         db.session.query(Device).delete()
+        db.session.commit()
+        db.session.close()
         try:
             with open('data/' + filename + "." + filetype, "r") as import_file:
                 if filetype.lower() == "yaml":
@@ -55,11 +58,12 @@ def get_all_devices():
     return devices
 
 
-def execute_cli_commands(device_id, commands, is_config=False):
+def execute_cli_commands(device_id, commands):
     device = get_device_by_id(device_id)
     if not device:
         return None, "Device not found"
 
+    print(commands)
     device_params = {
         'device_type': device.device_type,
         'ip': device.ip_address,
@@ -72,14 +76,10 @@ def execute_cli_commands(device_id, commands, is_config=False):
     results = {}
     try:
         with ConnectHandler(**device_params) as net_connect:
-            if is_config:
-                output = net_connect.send_config_set(commands)
-                results["config_commands"] = output
-            else:
-                for command in commands:
-                    output = net_connect.send_command(command, expect_string=r"#", read_timeout=60)
-                    results[command] = output
-                    net_connect.save_config()
+            for command in commands:
+                output = net_connect.send_command(command, expect_string=r"#", read_timeout=60)
+                results[command] = output
+                net_connect.save_config()
         return results, None
     except Exception as e:
         return None, str(e)
@@ -101,8 +101,10 @@ def set_backup_device_configuration(device_id):
     )
 
     with app.app_context():
+        db.session.begin()
         db.session.add(backup_entry)
         db.session.commit()
+        db.session.close()
 
     return True, None
 
@@ -151,12 +153,14 @@ def compare_configurations(config1, config2):
 
 def delete_backups(device_id, backup_ids):
     try:
+        db.session.begin()
         DeviceConfig.query.filter(
             DeviceConfig.device_id == device_id,
             DeviceConfig.id.in_(backup_ids)
         ).delete(synchronize_session=False)
 
         db.session.commit()
+        db.session.close()
     except Exception as e:
         db.session.rollback()
         raise e
@@ -166,6 +170,7 @@ def set_devices(devices):
     ids = set()
     names = set()
 
+    db.session.begin()
     for device in devices:
         device_id = device.get("id")
         device_name = device.get("name")
@@ -182,14 +187,10 @@ def set_devices(devices):
         try:
             device_obj = Device(**device)
             db.session.add(device_obj)
-            db.session.commit()
         except Exception as e:
             db.session.rollback()
             print(str(datetime.now()), "db insertion error", device_id, "ERROR", str(e))
             continue
 
-    try:
-        db.session.commit()
-    except Exception as e:
-        db.session.rollback()
-        print(datetime.now()), "db final commit error", device_id, "ERROR", str(e)
+    db.session.commit()
+    db.session.close()

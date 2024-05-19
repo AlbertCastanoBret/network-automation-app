@@ -123,8 +123,6 @@ class AsyncTaskManager:
                 if config:
                     device_db.current_configuration = config['startup']
 
-                db.session.commit()
-
                 self.update_device_status_table(device_db.id, True, used_cpu, used_ram_percentage, response_time)
 
                 if arp_table:
@@ -135,6 +133,9 @@ class AsyncTaskManager:
 
                 if bgp_neighbors:
                     self.update_bgp_table(device_db.id, bgp_neighbors)
+
+                db.session.commit()
+                db.session.close()
 
         except SQLAlchemyError as e:
             db.session.rollback()
@@ -159,6 +160,7 @@ class AsyncTaskManager:
 
                 db.session.add(device_status_db)
                 db.session.commit()
+                db.session.close()
 
         except SQLAlchemyError as e:
             print(f"Database error: {e}")
@@ -182,6 +184,7 @@ class AsyncTaskManager:
                     )
                     db.session.add(arp_entry)
                 db.session.commit()
+                db.session.close()
 
         except SQLAlchemyError as e:
             db.session.rollback()
@@ -218,6 +221,7 @@ class AsyncTaskManager:
 
                     db.session.add(interface_entry)
                 db.session.commit()
+                db.session.close()
 
         except SQLAlchemyError as e:
             db.session.rollback()
@@ -253,6 +257,7 @@ class AsyncTaskManager:
                         )
                         db.session.add(bgp_entry)
                 db.session.commit()
+                db.session.close()
 
         except SQLAlchemyError as e:
             db.session.rollback()
@@ -270,6 +275,7 @@ class AsyncTaskManager:
                 device_db.current_status = False
                 device_db.response_time = 0
                 db.session.commit()
+                db.session.close()
 
         except SQLAlchemyError as e:
             db.session.rollback()
@@ -282,7 +288,7 @@ class AsyncTaskManager:
     def delete_oldest_status(self, device_id: int):
         try:
             with app.app_context():
-                db.session.commit()
+                db.session.begin()
                 count = DeviceStatus.query.filter_by(device_id=device_id).count()
                 if count > self.MAX_RECORDS_PER_DEVICE:
                     excess = count - self.MAX_RECORDS_PER_DEVICE
@@ -292,6 +298,7 @@ class AsyncTaskManager:
                     for record in oldest_records:
                         db.session.delete(record)
                     db.session.commit()
+                    db.session.close()
 
         except SQLAlchemyError as e:
             db.session.rollback()
@@ -344,6 +351,7 @@ class AsyncTaskManager:
                 for host in hosts:
                     db.session.add(host)
                 db.session.commit()
+                db.session.close()
         except Exception as e:
             db.session.rollback()
             print(f"Failed to update hosts: {e}")

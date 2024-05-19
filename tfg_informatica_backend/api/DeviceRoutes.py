@@ -8,7 +8,7 @@ from services.DeviceManager import get_device_by_id, get_all_devices, get_device
 from . import device_bp
 
 
-@device_bp.route('/<int:device_id>', methods=['GET'])  # Asume que el ID es un entero
+@device_bp.route('/<int:device_id>', methods=['GET'])
 def get_device(device_id):
     device = get_device_by_id(device_id)
     if device:
@@ -54,12 +54,11 @@ def get_device_bgp_neighbors(device_id):
 def execute_commands(device_id):
     data = request.json
     commands = data.get('commands')
-    is_config = data.get('is_config', False)
 
     if not commands or not isinstance(commands, list):
         return jsonify({"error": "Invalid or no commands provided"}), 400
 
-    results, error = execute_cli_commands(device_id, commands, is_config)
+    results, error = execute_cli_commands(device_id, commands)
     if error:
         return jsonify({"error": error}), 500
     return jsonify(results)
