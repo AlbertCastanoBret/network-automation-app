@@ -1,6 +1,6 @@
 import React from 'react';
 import { FaTrashRestore } from 'react-icons/fa';
-import { FaAngleRight, FaChartSimple, FaGear } from 'react-icons/fa6';
+import { FaAngleRight, FaChartSimple, FaGear, FaMagnifyingGlass } from 'react-icons/fa6';
 import { NavLink } from 'react-router-dom';
 
 export const TableRow = ({ row, columns, index, isExpanded, onToggle, onRestore, onSelect, isLastRow }) => {
@@ -46,8 +46,13 @@ export const TableRow = ({ row, columns, index, isExpanded, onToggle, onRestore,
               onChange={handleSelectChange}
             />
           );
-        
-        } else if (column.field === 'currentStatus' || column.field === 'isEnabled' || column.field === 'isUp') {
+        } 
+        else if (column.field === 'data') {
+          cellData = 
+          <NavLink className="icon-button" to={`/task-scheduler/task-data?taskId=${row['id']}`}>
+            <FaMagnifyingGlass/>
+          </NavLink>
+        }else if (column.field === 'currentStatus' || column.field === 'isEnabled' || column.field === 'isUp') {
           const statusClassName = row[column.field] === 'Active' ? 'status-active' : 'status-inactive';
           cellData = <span className={statusClassName}></span>;
         } else {

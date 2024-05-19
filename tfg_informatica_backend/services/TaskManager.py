@@ -19,6 +19,12 @@ with app.app_context():
     scheduler.start()
 
 
+def get_task_by_id(task_id):
+    with app.app_context():
+        task = DeviceTask.query.get(task_id)
+    return task
+
+
 def get_all_tasks():
     with app.app_context():
         tasks = DeviceTask.query.all()
@@ -99,9 +105,9 @@ def task(task_id, device_id, commands):
         print("Result",  results)
         print("Error: ", error)
         if error:
-            DeviceTask.query.filter_by(id=task_id).update({'results': error}, synchronize_session=False)
+            DeviceTask.query.filter_by(id=task_id).update({'results': error, 'last_execution_time': datetime.now()}, synchronize_session=False)
         else:
-            DeviceTask.query.filter_by(id=task_id).update({'results': str(results)}, synchronize_session=False)
+            DeviceTask.query.filter_by(id=task_id).update({'results': str(results), 'last_execution_time': datetime.now()}, synchronize_session=False)
         db.session.commit()
         db.session.close()
 
@@ -125,11 +131,13 @@ def schedule_task(task, hour, minute, interval_minutes=None, cron_days=None):
 
 
 def schedule_repeated_tasks(task, interval_minutes, cron_days=None):
-    now = datetime.now()
+    now = datetime.now() + timedelta(seconds=1)
     end_of_day = datetime.combine(now.date(), datetime.max.time())
 
-    print(now.strftime('%a').lower()[:3])
-    if cron_days and now.strftime('%a').lower()[:3] not in cron_days.split(','):
+    print("Cron days: ", cron_days)
+    print("Today: ", now.strftime('%a').lower()[:3])
+    if cron_days is not None and now.strftime('%a').lower()[:3] not in cron_days.split(','):
+        print("Not scheduled for today")
         return
 
     scheduler.add_job(task, IntervalTrigger(minutes=interval_minutes, start_date=now, end_date=end_of_day))
@@ -139,6 +147,7 @@ def schedule_repeated_tasks(task, interval_minutes, cron_days=None):
         'date',
         run_date=end_of_day + timedelta(seconds=1)
     )
+
 
 
 def convert_days_to_cron_format(days_str):

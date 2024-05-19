@@ -381,6 +381,28 @@ button:hover {
   gap: 10px;
 }
 
+.task-results-page{
+  max-width: 1440px;
+  margin: auto;
+  padding: 0 20px;
+}
+
+.results-row{
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  margin-bottom: 10px;
+}
+
+.results-row > *{
+  margin: 0;
+}
+
+.results-row > :first-child{
+  margin-right: 10px;
+  min-width: 180px;
+}
+
 .hosts-page{
   max-width: 1440px;
   margin: auto;

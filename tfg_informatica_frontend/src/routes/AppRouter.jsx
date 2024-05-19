@@ -6,7 +6,9 @@ import DeviceSubPage from "../pages/DeviceSubPage"
 import { deviceConfigurationConfig, deviceDataConfig } from "../utils/DeviceViewsConfig"
 import { TaskSchedulerPage } from "../pages/TaskSchedulerPage"
 import Navbar from "../components/layout/NavBar"
-import { TaskEdit } from "../pages/TaskEdit"
+import { TaskEditPage } from "../pages/TaskEditPage"
+import { TaskDataPage } from "../pages/TaskDataPage"
+
 
 export const AppRouter = () => {
   return (
@@ -18,11 +20,11 @@ export const AppRouter = () => {
             <Route path="/devices/device-data" element={<DeviceSubPage viewsConfig={deviceDataConfig} />} />
             <Route path="/devices/device-configuration" element={<DeviceSubPage viewsConfig={deviceConfigurationConfig} />} />
 
-    
-            <Route path="/hosts" element={<HostsPage />} />
-
             <Route path="/task-scheduler" element={<TaskSchedulerPage />}/>
-            <Route path="/task-scheduler/task-edit" element={<TaskEdit />}/>
+            <Route path="/task-scheduler/task-edit" element={<TaskEditPage />}/>
+            <Route path="/task-scheduler/task-data" element={<TaskDataPage/>}/>
+
+            <Route path="/hosts" element={<HostsPage />} />
             
             <Route path="/*" element={<Navigate to="/" />} />
         </Routes>

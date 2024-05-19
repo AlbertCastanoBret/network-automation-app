@@ -14,7 +14,9 @@ class DeviceTask(db.Model):
     execution_time = db.Column(db.String(50), nullable=False)
     repeat_interval = db.Column(db.Integer, default=0, nullable=False)
     days_of_week = db.Column(db.String(50), default='(None)', nullable=False)
+
     results = db.Column(db.Text, default='', nullable=False)
+    last_execution_time = db.Column(db.DateTime, nullable=True)
 
     def to_dict(self):
         return {c.name: getattr(self, c.name) for c in self.__table__.columns}

@@ -6,7 +6,7 @@ import { useNavigate } from 'react-router-dom';
 
 Modal.setAppElement('#root');
 
-export const TaskEdit = () => {
+export const TaskEditPage = () => {
   const [name, setName] = useState('');
   const [commands, setCommands] = useState('');
   const [time, setTime] = useState('');

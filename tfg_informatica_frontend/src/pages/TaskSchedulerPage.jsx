@@ -16,7 +16,9 @@ export const TaskSchedulerPage = () => {
         name: task.name,
         time: task.execution_time,
         day_interval: task.repeat_interval,
-        week_interval: task.days_of_week
+        week_interval: task.days_of_week,
+        last_execution_time: task.last_execution_time,
+        task_results: task.results
       }));
       setTaskData(mappedData);
     };
@@ -25,7 +27,7 @@ export const TaskSchedulerPage = () => {
 
     const intervalId = setInterval(() => {
       loadData();
-    }, 30000)
+    }, 10000)
 
     return () => {
       clearInterval(intervalId);
@@ -36,11 +38,11 @@ export const TaskSchedulerPage = () => {
     { title: 'Id', field: 'id'},
     { title: 'Device Id', field: 'device_id'},
     { title: 'Name', field: 'name' },
-    { title: 'Execution Time', field: 'time' },
+    { title: 'Start Execution Time', field: 'time' },
     { title: 'Day Interval (Minutes)', field: 'day_interval'},
     { title: 'Week Interval', field: 'week_interval'},
-    { title: 'Last Execution Time', field: 'last_time'},
-    { title: 'Results', field: 'results'}
+    { title: 'Last Execution Time', field: 'last_execution_time'},
+    { title: 'Data', field: 'data'}
   ];
 
   return (

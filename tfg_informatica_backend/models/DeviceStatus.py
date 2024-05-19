@@ -10,7 +10,7 @@ class DeviceStatus(db.Model):
     id = db.Column(String(36), primary_key=True, default=lambda: str(uuid.uuid4()), unique=True)
     device_id = db.Column(db.Integer, db.ForeignKey('device.id'), nullable=False)
 
-    timestamp = db.Column(db.DateTime, default=datetime.utcnow, nullable=False)
+    timestamp = db.Column(db.DateTime, default=datetime.utcnow(), nullable=False)
     status = db.Column(db.Boolean, default=False, nullable=False)
     cpu = db.Column(db.String(50), default=0.0, nullable=False)
     memory = db.Column(db.String(200), default=0.0, nullable=False)

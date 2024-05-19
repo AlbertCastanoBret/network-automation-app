@@ -36,10 +36,10 @@ software.
 
 ROM: IOS-XE ROMMON
 
-FirstRouter uptime is 16 hours, 49 minutes
-Uptime for this control processor is 16 hours, 49 minutes
+FirstRouter uptime is 19 hours, 44 minutes
+Uptime for this control processor is 19 hours, 45 minutes
 System returned to ROM by reload
-System restarted at 07:27:51 UTC Sat May 18 2024
+System restarted at 15:40:48 UTC Sat May 18 2024
 System image file is "bootflash:packages.conf"
 Last reload reason: Unknown reason
 
