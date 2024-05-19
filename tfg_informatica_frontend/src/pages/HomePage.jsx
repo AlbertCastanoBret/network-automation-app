@@ -7,8 +7,7 @@ import { fetchData } from '../utils/fetchData';
 ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, ArcElement, BarElement, Title, Tooltip, Legend);
 
 export const HomePage = () => {
-  const [devicesData, setDevices] = useState([]);
-  const [chartData, setChartData] = useState({
+  const [devicesData, setDevicesData] = useState({
     labels: ['Active', 'Inactive'],
     datasets: [
       {
@@ -20,26 +19,38 @@ export const HomePage = () => {
       },
     ],
   });
-  const [barChartData, setBarChartData] = useState({
+  const [cpuMemoryData, setCpuMemoryData] = useState({
     labels: ['CPU Usage', 'Memory Usage(%)'],
     datasets: [
       {
         label: 'Average',
         data: [0, 0],
-        backgroundColor: ['#646cff', '#ff6384'],
-        borderColor: ['#9ca1fc', '#ff9c99'],
+        backgroundColor: ['#646cff', '#333'],
+          borderColor: ['#9ca1fc', '#c6c9ff'],
         borderWidth: 0.5,
       },
     ],
   });
-  const [responseTimeChartData, setResponseTimeChartData] = useState({
+  const [responseTimeData, setResponseTimeData] = useState({
     labels: ['Response Time'],
     datasets: [
       {
         label: 'Average',
         data: [0],
-        backgroundColor: ['#ff9c33'],
-        borderColor: ['#ffb27f'],
+        backgroundColor: ['#646cff'],
+          borderColor: ['#9ca1fc'],
+        borderWidth: 0.5,
+      },
+    ],
+  });
+  const [tasksData, setTasksData] = useState({
+    labels: ['Active', 'Finished', 'Scheduled'],
+    datasets: [
+      {
+        label: 'Tasks',
+        data: [0, 0, 0],
+        backgroundColor: ['#646cff', '#333', '#9ca1fc'],
+        borderColor: ['#9ca1fc', '#c6c9ff', '#ffffff'],
         borderWidth: 0.5,
       },
     ],
@@ -51,7 +62,6 @@ export const HomePage = () => {
       const mappedData = apiData.map((device) => ({
         currentStatus: device.current_status ? 'Active' : 'Inactive',
       }));
-      setDevices(mappedData);
       prepareData(mappedData);
 
       const apiData2 = await fetchData('/devices/status');
@@ -63,6 +73,13 @@ export const HomePage = () => {
       }));
       prepareBarChartData(mappedData2);
       prepareResponseTimeChartData(mappedData2);
+
+      const apiData3 = await fetchData('/task-scheduler');
+      const mappedData3 = apiData3.map((task) => ({
+        isStarted: task.is_started,
+        isFinished: task.is_finished,
+      }));
+      prepareTasksData(mappedData3);
     };
 
     loadData();
@@ -85,7 +102,7 @@ export const HomePage = () => {
       [0, 0]
     );
 
-    setChartData({
+    setDevicesData({
       labels: ['Active', 'Inactive'],
       datasets: [
         {
@@ -101,17 +118,17 @@ export const HomePage = () => {
 
   const prepareBarChartData = (data) => {
     const totalDevices = data.length;
-    const avgCpu = data.reduce((acc, status) => acc + status.cpu, 0) / totalDevices;
+    const avgCpu = data.reduce((acc, status) => acc + status.cpu, 0) / totalDevices * 100;
     const avgMemory = data.reduce((acc, status) => acc + status.memory, 0) / totalDevices;
 
-    setBarChartData({
-      labels: ['CPU Usage', 'Memory Usage(%)'],
+    setCpuMemoryData({
+      labels: ['CPU Usage(%)', 'Memory Usage(%)'],
       datasets: [
         {
           label: 'Average',
           data: [avgCpu, avgMemory],
-          backgroundColor: ['#646cff', '#ff6384'],
-          borderColor: ['#9ca1fc', '#ff9c99'],
+          backgroundColor: ['#646cff', '#333'],
+          borderColor: ['#9ca1fc', '#c6c9ff'],
           borderWidth: 0.5,
         },
       ],
@@ -122,28 +139,48 @@ export const HomePage = () => {
     const totalDevices = data.length;
     const avgResponseTime = data.reduce((acc, status) => acc + status.responseTime, 0) / totalDevices;
 
-    setResponseTimeChartData({
+    setResponseTimeData({
       labels: ['Response Time'],
       datasets: [
         {
           label: 'Average',
           data: [avgResponseTime],
-          backgroundColor: ['#ff9c33'],
-          borderColor: ['#ffb27f'],
+          backgroundColor: ['#646cff'],
+          borderColor: ['#9ca1fc'],
           borderWidth: 0.5,
         },
       ],
     });
   };
 
+  const prepareTasksData = (data) => {
+    const activeTasks = data.filter((task) => task.isStarted && !task.isFinished).length;
+    const finishedTasks = data.filter((task) => task.isFinished).length;
+    const scheduledTasks = data.filter((task) => !task.isStarted && !task.isFinished).length;
+
+    setTasksData({
+      labels: ['Active', 'Finished', 'Scheduled'],
+      datasets: [
+        {
+          label: 'Tasks',
+          data: [activeTasks, finishedTasks, scheduledTasks],
+          backgroundColor: ['#646cff', '#333', '#9ca1fc'],
+          borderColor: ['#9ca1fc', '#c6c9ff', '#ffffff'],
+          borderWidth: 0.5,
+        },
+      ],
+    });
+  }
+
   return (
     <>
       <div className="home-page">
         <h1>Dashboard</h1>
         <div className="charts-container">
-            <PieChart chartData={chartData} title="Devices Status" />
-            <BarChart chartData={barChartData} title="Average CPU and Memory Usage" />
-            <BarChart chartData={responseTimeChartData} title="Average Response Time"  min={0} max={5} style={{marginTop: '40px'}}/>
+            <PieChart chartData={devicesData} title="Devices Status" />
+            <BarChart chartData={cpuMemoryData} title="Average CPU and Memory Usage" style={{marginTop: '40px', display: "flex", justifyContent: "center"}}/>
+            <BarChart chartData={responseTimeData} title="Average Response Time"  min={0} max={5} style={{marginTop: '40px', display: "flex", justifyContent: "center"}}/>
+            <PieChart chartData={tasksData} title="Task Scheduler" />
         </div>
       </div>
     </>
