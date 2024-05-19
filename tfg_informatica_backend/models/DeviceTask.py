@@ -17,6 +17,9 @@ class DeviceTask(db.Model):
 
     results = db.Column(db.Text, default='', nullable=False)
     last_execution_time = db.Column(db.DateTime, nullable=True)
+    is_started = db.Column(db.Boolean, default=False, nullable=False)
+    is_finished = db.Column(db.Boolean, default=False, nullable=False)
+    is_paused = db.Column(db.Boolean, default=False, nullable=False)
 
     def to_dict(self):
         return {c.name: getattr(self, c.name) for c in self.__table__.columns}

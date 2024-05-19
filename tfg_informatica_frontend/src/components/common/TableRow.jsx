@@ -1,9 +1,10 @@
 import React from 'react';
-import { FaTrashRestore } from 'react-icons/fa';
-import { FaAngleRight, FaChartSimple, FaGear, FaMagnifyingGlass } from 'react-icons/fa6';
+import { FaPause, FaPlay, FaStop, FaTrashRestore } from 'react-icons/fa';
+import { FaAngleRight, FaChartSimple, FaGear, FaMagnifyingGlass, FaRegCirclePause } from 'react-icons/fa6';
+import { TbFlagPause } from 'react-icons/tb';
 import { NavLink } from 'react-router-dom';
 
-export const TableRow = ({ row, columns, index, isExpanded, onToggle, onRestore, onSelect, isLastRow }) => {
+export const TableRow = ({ row, columns, index, isExpanded, onToggle, onRestore, onSelect, isLastRow, onPause, onResume, onStop }) => {
 
   const handleSelectChange = (e) => {
     onSelect(e, row.id);
@@ -52,7 +53,29 @@ export const TableRow = ({ row, columns, index, isExpanded, onToggle, onRestore,
           <NavLink className="icon-button" to={`/task-scheduler/task-data?taskId=${row['id']}`}>
             <FaMagnifyingGlass/>
           </NavLink>
-        }else if (column.field === 'currentStatus' || column.field === 'isEnabled' || column.field === 'isUp') {
+        } else if (column.field === 'play_pause') {
+          cellData = row['isFinished'] || !row['isStarted']? (
+            <></>
+          ) : (
+            row['isPaused'] ? (
+              <FaPlay
+                className='icon-button'
+                onClick={() => onResume(row['id'])}
+            /> ) : (
+              <FaPause
+                className='icon-button'
+                onClick={() => onPause(row['id'])}
+              />
+            )
+          );
+        } else if (column.field === 'stop') {
+          cellData = !row['isFinished'] && row['isStarted'] ? (
+            <FaStop
+              className='icon-button'
+              onClick={() => onStop(row['id'])}
+            />
+          ) : (<></>);
+        } else if (column.field === 'currentStatus' || column.field === 'isEnabled' || column.field === 'isUp') {
           const statusClassName = row[column.field] === 'Active' ? 'status-active' : 'status-inactive';
           cellData = <span className={statusClassName}></span>;
         } else {

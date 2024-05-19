@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { TableRow } from './TableRow';
 
-export const Table = ({ columns, data, additionalClassName, secondaryColumns = [], onRestore, onSelect }) => {
+export const Table = ({ columns, data, additionalClassName, secondaryColumns = [], onRestore, onSelect, onPause, onResume, onStop }) => {
   const [expandedRows, setExpandedRows] = useState([]);
 
   const handleRowToggle = (index) => {
@@ -33,6 +33,9 @@ export const Table = ({ columns, data, additionalClassName, secondaryColumns = [
                 onToggle={() => handleRowToggle(index)}
                 onRestore={onRestore}
                 onSelect={onSelect}
+                onPause={onPause}
+                onResume={onResume}
+                onStop={onStop}
                 isLastRow={index === data.length - 1}
               />
               {expandedRows.includes(index) && (

@@ -22,12 +22,16 @@ with app.app_context():
 def get_task_by_id(task_id):
     with app.app_context():
         task = DeviceTask.query.get(task_id)
+        if task:
+            task.is_finished = is_job_finished(task_id)
     return task
 
 
 def get_all_tasks():
     with app.app_context():
         tasks = DeviceTask.query.all()
+        for task in tasks:
+            task.is_finished = is_job_finished(task.id)
     return tasks
 
 
@@ -92,7 +96,7 @@ def set_task(data):
 
     for device_id in device_ids:
         specific_task = partial(task, task_id=id, device_id=device_id, commands=commands_list)
-        schedule_task(specific_task, hour, minute, repeat_interval_str, days_str)
+        schedule_task(specific_task, hour, minute, repeat_interval_str, days_str, id)
 
     return True, None
 
@@ -105,32 +109,35 @@ def task(task_id, device_id, commands):
         print("Result",  results)
         print("Error: ", error)
         if error:
-            DeviceTask.query.filter_by(id=task_id).update({'results': error, 'last_execution_time': datetime.now()}, synchronize_session=False)
+            DeviceTask.query.filter_by(id=task_id).update({'results': error, 'last_execution_time': datetime.now(), 'is_started': True}, synchronize_session=False)
         else:
-            DeviceTask.query.filter_by(id=task_id).update({'results': str(results), 'last_execution_time': datetime.now()}, synchronize_session=False)
+            DeviceTask.query.filter_by(id=task_id).update({'results': str(results), 'last_execution_time': datetime.now(), 'is_started': True}, synchronize_session=False)
         db.session.commit()
         db.session.close()
 
 
-def schedule_task(task, hour, minute, interval_minutes=None, cron_days=None):
+def schedule_task(task, hour, minute, interval_minutes=None, cron_days=None, job_id=None):
     timezone = tzlocal.get_localzone()
     now = datetime.now()
     end_of_day = datetime.combine(now.date(), datetime.max.time())
 
+    task_start_time = datetime.combine(now.date(), datetime.min.time()).replace(hour=hour, minute=minute)
+    end_time = task_start_time + timedelta(milliseconds=100)
+
     def start_task():
-        schedule_repeated_tasks(task, interval_minutes, cron_days)
+        schedule_repeated_tasks(task, interval_minutes, cron_days, job_id)
 
     if interval_minutes is None and cron_days is None:
-        scheduler.add_job(task, CronTrigger(hour=hour, minute=minute, timezone=timezone, end_date=end_of_day))
+        scheduler.add_job(task, CronTrigger(hour=hour, minute=minute, timezone=timezone, end_date=end_time), id=job_id)
     elif interval_minutes is not None and cron_days is None:
-        scheduler.add_job(start_task, CronTrigger(hour=hour, minute=minute, timezone=timezone, end_date=end_of_day))
+        scheduler.add_job(start_task, CronTrigger(hour=hour, minute=minute, timezone=timezone, end_date=end_of_day), id=job_id)
     elif interval_minutes is None and cron_days is not None:
-        scheduler.add_job(task, CronTrigger(hour=hour, minute=minute, day_of_week=cron_days, timezone=timezone))
+        scheduler.add_job(task, CronTrigger(hour=hour, minute=minute, day_of_week=cron_days, timezone=timezone), id=job_id)
     elif interval_minutes is not None and cron_days is not None:
-        scheduler.add_job(start_task, CronTrigger(hour=hour, minute=minute, day_of_week=cron_days, timezone=timezone))
+        scheduler.add_job(start_task, CronTrigger(hour=hour, minute=minute, day_of_week=cron_days, timezone=timezone), id=job_id)
 
 
-def schedule_repeated_tasks(task, interval_minutes, cron_days=None):
+def schedule_repeated_tasks(task, interval_minutes, cron_days=None, job_id=None):
     now = datetime.now() + timedelta(seconds=1)
     end_of_day = datetime.combine(now.date(), datetime.max.time())
 
@@ -140,14 +147,44 @@ def schedule_repeated_tasks(task, interval_minutes, cron_days=None):
         print("Not scheduled for today")
         return
 
-    scheduler.add_job(task, IntervalTrigger(minutes=interval_minutes, start_date=now, end_date=end_of_day))
+    scheduler.add_job(task, IntervalTrigger(minutes=interval_minutes, start_date=now, end_date=end_of_day), id=job_id)
 
     scheduler.add_job(
-        lambda: schedule_repeated_tasks(task, interval_minutes, cron_days),
+        lambda: schedule_repeated_tasks(task, interval_minutes, cron_days, job_id),
         'date',
         run_date=end_of_day + timedelta(seconds=1)
     )
 
+
+def pause_task_by_task_id(job_id):
+    scheduler.pause_job(job_id)
+    db.session.begin()
+    DeviceTask.query.filter_by(id=job_id).update({'is_paused': True}, synchronize_session=False)
+    db.session.commit()
+    db.session.close()
+
+
+def resume_task_by_task_id(job_id):
+    scheduler.resume_job(job_id)
+    db.session.begin()
+    DeviceTask.query.filter_by(id=job_id).update({'is_paused': False}, synchronize_session=False)
+    db.session.commit()
+    db.session.close()
+
+
+def is_job_finished(job_id):
+    job = scheduler.get_job(job_id)
+    if job is None:
+        return True
+    return False
+
+
+def stop_task_by_task_id(job_id):
+    scheduler.remove_job(job_id)
+    db.session.begin()
+    DeviceTask.query.filter_by(id=job_id).update({'is_paused': False, 'is_started': False, 'is_finished': True}, synchronize_session=False)
+    db.session.commit()
+    db.session.close()
 
 
 def convert_days_to_cron_format(days_str):

@@ -1,7 +1,8 @@
 from flask import jsonify
 from flask import request
 
-from services.TaskManager import set_task, get_all_tasks, get_task_by_id
+from services.TaskManager import set_task, get_all_tasks, get_task_by_id, pause_task_by_task_id, resume_task_by_task_id, \
+    stop_task_by_task_id
 from . import task_scheduler_bp
 
 
@@ -32,4 +33,22 @@ def schedule_task():
         return jsonify({"success": "Task scheduled"}), 200
     else:
         return jsonify({"error": error}), 400
+
+
+@task_scheduler_bp.route('/pause/<string:task_id>', methods=['POST'])
+def pause_task(task_id):
+    pause_task_by_task_id(task_id)
+    return jsonify({"success": "Task paused"}), 200
+
+
+@task_scheduler_bp.route('/resume/<string:task_id>', methods=['POST'])
+def resume_task(task_id):
+    resume_task_by_task_id(task_id)
+    return jsonify({"success": "Task resumed"}), 200
+
+
+@task_scheduler_bp.route('/stop/<string:task_id>', methods=['POST'])
+def stop_task(task_id):
+    stop_task_by_task_id(task_id)
+    return jsonify({"success": "Task stopped"}), 200
 

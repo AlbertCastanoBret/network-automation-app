@@ -70,6 +70,7 @@ export const TaskDataPage = () => {
   return (
     <div className="task-results-page">
       <h1>Task Data</h1>
+      <h2>Data</h2>
       <div className="results-row">
         <strong>ID: </strong>
         <p>{taskData.id || 'Loading...'}</p>
@@ -83,12 +84,12 @@ export const TaskDataPage = () => {
         <p>{taskData.deviceId || 'Loading...'}</p>
       </div>
       <div className="results-row">
-        <strong>Execution Time: </strong>
+        <strong>Start Execution Time: </strong>
         <p>{taskData.executionTime || 'Loading...'}</p>
       </div>
       <div className="results-row">
         <strong>Day Interval (Minutes): </strong>
-        <p>{taskData.repeatInterval || 'Loading...'}</p>
+        <p>{taskData.repeatInterval !== null ? taskData.repeatInterval: 'Loading...'}</p>
       </div>
       <div className="results-row">
         <strong>Week Interval: </strong>
@@ -98,6 +99,7 @@ export const TaskDataPage = () => {
         <strong>Last Execution Time: </strong>
         <p>{taskData.lastExecutionTime || 'Loading...'}</p>
       </div>
+      <h2 style={{marginTop: '40px'}}>Results</h2>
       <div className="terminal-screen">
         {taskData.results ? renderResults() : 'Loading results...'}
       </div>
