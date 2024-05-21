@@ -41,7 +41,7 @@ export const ConfigHistoryView = ({ activeView }) => {
       }));
       setConfigHistoryData(mappedData);
 
-      if (mappedData.length === 0) {
+      /*if (mappedData.length === 0) {
         await saveCurrentConfig();
         await refreshConfigHistory();
       } else {
@@ -53,7 +53,7 @@ export const ConfigHistoryView = ({ activeView }) => {
           await saveCurrentConfig();
           await refreshConfigHistory();
         }
-      }
+      }*/
     } catch (error) {
       if (error.name === 'AbortError') {
         console.log('Fetch aborted');

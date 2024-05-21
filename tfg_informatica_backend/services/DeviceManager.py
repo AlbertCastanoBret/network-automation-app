@@ -26,6 +26,8 @@ def import_devices_from_file(filename, filetype):
                     raise ValueError("Unsupported filetype provided")
 
             set_devices(devices)
+            for device in devices:
+                set_backup_device_configuration(device.get("id"))
             return True
         except Exception as e:
             print(str(datetime.now()), "import error", filename, "ERROR", str(e))
@@ -67,7 +69,6 @@ def execute_cli_commands(device_id, commands):
     if not device:
         return None, "Device not found"
 
-    print(commands)
     device_params = {
         'device_type': device.device_type,
         'ip': device.ip_address,
@@ -84,9 +85,35 @@ def execute_cli_commands(device_id, commands):
                 output = net_connect.send_command(command, expect_string=r"#", read_timeout=60)
                 results[command] = output
                 net_connect.save_config()
+            current_config = net_connect.send_command("show running-config", expect_string=r"#", read_timeout=60)
+            net_connect.disconnect()
+
+            latest_config = (db.session.query(DeviceConfig)
+                             .filter_by(device_id=device_id)
+                             .order_by(DeviceConfig.timestamp.desc())
+                             .first())
+            diff = compare_configurations(current_config, latest_config.config)
+            if diff != '':
+                set_backup_device_configuration_with_config(device_id, current_config)
         return results, None
     except Exception as e:
         return None, str(e)
+
+
+def set_backup_device_configuration_with_config(device_id, config):
+    backup_entry = DeviceConfig(
+        device_id=device_id,
+        config=config,
+        timestamp=datetime.now()
+    )
+
+    with app.app_context():
+        db.session.begin()
+        db.session.add(backup_entry)
+        db.session.commit()
+        db.session.close()
+
+    return True, None
 
 
 def set_backup_device_configuration(device_id):
@@ -97,6 +124,7 @@ def set_backup_device_configuration(device_id):
     driver = get_network_driver(device.os)
     with driver(device.ip_address, device.username, device.password) as device_conn:
         config = device_conn.get_config()
+        device_conn.close()
 
     backup_entry = DeviceConfig(
         device_id=device_id,

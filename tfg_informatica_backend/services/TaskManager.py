@@ -141,10 +141,7 @@ def schedule_repeated_tasks(task, interval_minutes, cron_days=None, job_id=None)
     now = datetime.now() + timedelta(seconds=1)
     end_of_day = datetime.combine(now.date(), datetime.max.time())
 
-    print("Cron days: ", cron_days)
-    print("Today: ", now.strftime('%a').lower()[:3])
     if cron_days is not None and now.strftime('%a').lower()[:3] not in cron_days.split(','):
-        print("Not scheduled for today")
         return
 
     scheduler.add_job(task, IntervalTrigger(minutes=interval_minutes, start_date=now, end_date=end_of_day), id=job_id)

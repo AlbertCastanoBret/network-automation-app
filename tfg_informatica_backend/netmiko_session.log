@@ -5,15 +5,219 @@ FirstRouter#
 FirstRouter#terminal width 511
 FirstRouter#terminal length 0
 FirstRouter#
-FirstRouter#sh ip int brief
-Interface              IP-Address      OK? Method Status                Protocol
-GigabitEthernet1       192.168.0.30    YES DHCP   up                    up      
-GigabitEthernet2       unassigned      YES DHCP   up                    up      
-GigabitEthernet3       unassigned      YES unset  administratively down down    
+FirstRouter#conf t
+Enter configuration commands, one per line.  End with CNTL/Z.
+FirstRouter(config)#
+FirstRouter(config)#
+FirstRouter(config)#
+FirstRouter(config)#
+FirstRouter(config)#write mem
+                     ^
+% Invalid input detected at '^' marker.
+
+FirstRouter(config)#int gig1
+FirstRouter(config-if)#
+FirstRouter(config-if)#
+FirstRouter(config-if)#write mem
+                       ^
+% Invalid input detected at '^' marker.
+
+FirstRouter(config-if)#description hola
+FirstRouter(config-if)#
+FirstRouter(config-if)#
+FirstRouter(config-if)#write mem
+                       ^
+% Invalid input detected at '^' marker.
+
+FirstRouter(config-if)#no shutdown
+FirstRouter(config-if)#
+FirstRouter(config-if)#
+FirstRouter(config-if)#write mem
+                       ^
+% Invalid input detected at '^' marker.
+
+FirstRouter(config-if)#end
 FirstRouter#
 FirstRouter#
 FirstRouter#write mem
 Building configuration...
 [OK]
+FirstRouter#wr
+Building configuration...
+[OK]
+FirstRouter#
+FirstRouter#
+FirstRouter#write mem
+Building configuration...
+[OK]
+FirstRouter#show running-config
+Building configuration...
+
+Current configuration : 1817 bytes
+!
+! Last configuration change at 22:39:11 UTC Sun May 19 2024 by ********
+! NVRAM config last updated at 22:39:12 UTC Sun May 19 2024 by ********
+!
+version 16.3
+service timestamps debug datetime msec
+service timestamps log datetime msec
+no platform punt-keepalive disable-kernel-core
+platform console auto
+!
+hostname FirstRouter
+!
+boot-start-marker
+boot-end-marker
+!
+!
+!
+no aaa new-model
+!
+!
+!
+!
+!
+!
+!
+!
+!
+ip domain name ********quokka.com
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+subscriber templating
+!
+!
+!
+multilink bundle-name authenticated
+!
+!
+!
+!
+!
+crypto pki trustpoint TP-self-signed-2458469978
+ enrollment selfsigned
+ subject-name cn=IOS-Self-Signed-Certificate-2458469978
+ revocation-check none
+ rsakeypair TP-self-signed-2458469978
+!
+!
+crypto pki certificate chain TP-self-signed-2458469978
+!
+!
+!
+!
+!
+!
+!
+!
+license udi pid CSR1000V sn 9C1M3A8N3UB
+diagnostic bootup level minimal
+!
+spanning-tree extend system-id
+!
+!
+username ******** privilege 15 secret 5 $1$o8gx$YHYUlVtF0k3qkxhhU7wMD.
+!
+redundancy
+!
+!
+!
+!
+!
+!
+! 
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+! 
+! 
+! 
+! 
+! 
+! 
+!
+!
+interface GigabitEthernet1
+ description hola
+ ip address dhcp
+ negotiation auto
+ no mop enabled
+ no mop sysid
+!
+interface GigabitEthernet2
+ ip address dhcp
+ negotiation auto
+ no mop enabled
+ no mop sysid
+!
+interface GigabitEthernet3
+ no ip address
+ shutdown
+ negotiation auto
+ no mop enabled
+ no mop sysid
+!
+!
+virtual-service csr_mgmt
+!
+ip forward-protocol nd
+ip http server
+ip http authentication local
+ip http secure-server
+ip http client source-interface GigabitEthernet2
+!
+ip tftp source-interface GigabitEthernet2
+ip ssh version 2
+!
+!
+!
+!
+!
+!
+control-plane
+!
+ !
+ !
+ !
+ !
+!
+!
+!
+!
+!
+line con 0
+ stopbits 1
+line vty 0 4
+ login local
+ transport input ssh
+!
+ntp server 34.208.249.133
+!
+!
+!
+!
+!
+!
+pnp profile pnp_cco_profile
+ transport https ipv4 34.192.246.10 port 443
+end
+
 FirstRouter#
 FirstRouter#exit
