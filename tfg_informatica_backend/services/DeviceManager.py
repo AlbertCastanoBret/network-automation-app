@@ -85,8 +85,12 @@ def execute_cli_commands(device_id, commands):
                 output = net_connect.send_command(command, expect_string=r"#", read_timeout=60)
                 results[command] = output
                 net_connect.save_config()
-            current_config = net_connect.send_command("show running-config", expect_string=r"#", read_timeout=60)
             net_connect.disconnect()
+
+            driver = get_network_driver(device.os)
+            with driver(device.ip_address, device.username, device.password) as device_conn:
+                current_config = device_conn.get_config()['running']
+                device_conn.close()
 
             latest_config = (db.session.query(DeviceConfig)
                              .filter_by(device_id=device_id)
@@ -117,6 +121,9 @@ def set_backup_device_configuration_with_config(device_id, config):
 
 
 def set_backup_device_configuration(device_id):
+    if DeviceConfig.query.filter_by(device_id=device_id).count() > 0:
+        return False, "Backup already exists"
+
     device = Device.query.get(device_id)
     if not device:
         return None, "Device not found"
@@ -168,6 +175,7 @@ def restore_device_configuration(device_id, backup_id):
         with ConnectHandler(**device_params) as net_connect:
             net_connect.send_config_set(backup.config.split('\n'))
             net_connect.save_config()
+            net_connect.disconnect()
         return True, None
     except Exception as e:
         return None, str(e)

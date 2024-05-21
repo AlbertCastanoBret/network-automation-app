@@ -4,7 +4,6 @@ import tzlocal
 from apscheduler.schedulers.background import BackgroundScheduler
 from apscheduler.triggers.cron import CronTrigger
 from apscheduler.triggers.interval import IntervalTrigger
-from netmiko import ConnectHandler
 
 from app import db, app
 from models.Device import Device

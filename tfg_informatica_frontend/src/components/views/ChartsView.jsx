@@ -41,7 +41,7 @@ export const ChartsView = ({activeView}) => {
         });
 
         const responseTimes = data.map(item => item.response_time);
-        const cpuUsages = data.map(item => item.cpu);
+        const cpuUsages = data.map(item => item.cpu * 100);
         const memoryUsages = data.map(item => item.memory);
         const statusTimes = data.map(item => item.status);
 
@@ -103,7 +103,7 @@ export const ChartsView = ({activeView}) => {
         <h2> Status</h2> 
         <div className="charts-container">
             <LineChart chartData={responseTimeData} title="Response Time" min={1} max={3}></LineChart>
-            <LineChart chartData={cpuData} title="CPU Usage" min={0} max={1}></LineChart>
+            <LineChart chartData={cpuData} title="CPU Usage" min={0} max={100}></LineChart>
             <LineChart chartData={memoryData} title="Memory Usage" min={0} max={100}></LineChart>
             <LineChart chartData={statusData} title="Status" min={0} max={1} limitTicksToValues={[0, 1]}></LineChart>
         </div>
