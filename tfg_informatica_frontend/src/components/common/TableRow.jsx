@@ -1,7 +1,6 @@
 import React from 'react';
 import { FaPause, FaPlay, FaStop, FaTrashRestore } from 'react-icons/fa';
-import { FaAngleRight, FaChartSimple, FaGear, FaMagnifyingGlass, FaRegCirclePause } from 'react-icons/fa6';
-import { TbFlagPause } from 'react-icons/tb';
+import { FaAngleRight, FaChartSimple, FaGear, FaMagnifyingGlass } from 'react-icons/fa6';
 import { NavLink } from 'react-router-dom';
 
 export const TableRow = ({ row, columns, index, isExpanded, onToggle, onRestore, onSelect, isLastRow, onPause, onResume, onStop }) => {

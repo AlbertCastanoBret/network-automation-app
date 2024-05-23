@@ -31,6 +31,7 @@ def get_all_tasks():
         tasks = DeviceTask.query.all()
         for task in tasks:
             task.is_finished = is_job_finished(task.id)
+
     return tasks
 
 
@@ -143,17 +144,20 @@ def schedule_repeated_tasks(task, interval_minutes, cron_days=None, job_id=None)
     if cron_days is not None and now.strftime('%a').lower()[:3] not in cron_days.split(','):
         return
 
-    scheduler.add_job(task, IntervalTrigger(minutes=interval_minutes, start_date=now, end_date=end_of_day), id=job_id)
+    scheduler.add_job(task, IntervalTrigger(minutes=interval_minutes, start_date=now, end_date=end_of_day), id=job_id+"-day_interval")
 
     scheduler.add_job(
-        lambda: schedule_repeated_tasks(task, interval_minutes, cron_days, job_id),
+        lambda: schedule_repeated_tasks(task, interval_minutes, cron_days, job_id+"-day_interval"),
         'date',
         run_date=end_of_day + timedelta(seconds=1)
     )
 
 
 def pause_task_by_task_id(job_id):
-    scheduler.pause_job(job_id)
+    if scheduler.get_job(job_id):
+        scheduler.pause_job(job_id)
+    if scheduler.get_job(job_id+"-day_interval"):
+        scheduler.pause_job(job_id+"-day_interval")
     db.session.begin()
     DeviceTask.query.filter_by(id=job_id).update({'is_paused': True}, synchronize_session=False)
     db.session.commit()
@@ -161,7 +165,10 @@ def pause_task_by_task_id(job_id):
 
 
 def resume_task_by_task_id(job_id):
-    scheduler.resume_job(job_id)
+    if scheduler.get_job(job_id):
+        scheduler.resume_job(job_id)
+    if scheduler.get_job(job_id+"-day_interval"):
+        scheduler.resume_job(job_id+"-day_interval")
     db.session.begin()
     DeviceTask.query.filter_by(id=job_id).update({'is_paused': False}, synchronize_session=False)
     db.session.commit()
@@ -171,12 +178,18 @@ def resume_task_by_task_id(job_id):
 def is_job_finished(job_id):
     job = scheduler.get_job(job_id)
     if job is None:
-        return True
+        job = scheduler.get_job(job_id+"-day_interval")
+        if job is None:
+            return True
+        return False
     return False
 
 
 def stop_task_by_task_id(job_id):
-    scheduler.remove_job(job_id)
+    if scheduler.get_job(job_id):
+        scheduler.remove_job(job_id)
+    if scheduler.get_job(job_id+"-day_interval"):
+        scheduler.remove_job(job_id+"-day_interval")
     db.session.begin()
     DeviceTask.query.filter_by(id=job_id).update({'is_paused': False, 'is_started': False, 'is_finished': True}, synchronize_session=False)
     db.session.commit()

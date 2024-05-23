@@ -9,6 +9,7 @@ from sqlalchemy.exc import SQLAlchemyError
 
 from app import app, db
 from models.Device import Device
+from models.DeviceConfig import DeviceConfig
 from models.DeviceStatus import DeviceStatus
 from models.DeviceArpEntry import DeviceArpEntry
 from models.DeviceInterface import DeviceInterface
@@ -121,7 +122,8 @@ class AsyncTaskManager:
                 device_db.last_checked = datetime.now()
 
                 if config:
-                    device_db.current_configuration = config['startup']
+                    device_db.current_configuration = config['running']
+                    self.update_device_config_table(device_db.id, config)
 
                 self.update_device_status_table(device_db.id, True, used_cpu, used_ram_percentage, response_time)
 
@@ -140,6 +142,33 @@ class AsyncTaskManager:
         except SQLAlchemyError as e:
             db.session.rollback()
             print(f"Database error: {e}")
+
+        except Exception as e:
+            db.session.rollback()
+            print(f"An unexpected error occurred: {e}")
+
+
+    def update_device_config_table(self, device_id: int, config: dict):
+        try:
+            with app.app_context():
+                if DeviceConfig.query.filter_by(device_id=device_id).count() > 0:
+                    return
+
+                db.session.begin()
+                DeviceConfig.query.filter_by(device_id=device_id).delete()
+
+                device_config_db = DeviceConfig(
+                    device_id=device_id,
+                    config=config['running'],
+                    timestamp=datetime.now()
+                )
+                db.session.add(device_config_db)
+                db.session.commit()
+                db.session.close()
+
+        except SQLAlchemyError as e:
+            db.session.rollback()
+            print(f"Database error when updating device config table: {e}")
 
         except Exception as e:
             db.session.rollback()
