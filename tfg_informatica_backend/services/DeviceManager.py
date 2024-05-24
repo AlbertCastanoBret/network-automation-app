@@ -208,21 +208,15 @@ def delete_backups(device_id, backup_ids):
 
 def set_devices(devices):
     ids = set()
-    names = set()
 
     db.session.begin()
     for device in devices:
         device_id = device.get("id")
-        device_name = device.get("name")
 
         if device_id in ids:
             print(str(datetime.now()), "duplicate id", device_id, "ERROR", "Duplicate device id")
             continue
-        if device_name in names:
-            print(str(datetime.now()), "duplicate name", device_name, "ERROR", "Duplicate device name")
-            continue
         ids.add(device_id)
-        names.add(device_name)
 
         try:
             device_obj = Device(**device)

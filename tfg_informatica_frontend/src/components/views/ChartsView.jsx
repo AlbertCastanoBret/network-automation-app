@@ -41,7 +41,7 @@ export const ChartsView = ({activeView}) => {
         });
 
         const responseTimes = data.map(item => item.response_time);
-        const cpuUsages = data.map(item => item.cpu * 100);
+        const cpuUsages = data.map(item => item.cpu);
         const memoryUsages = data.map(item => item.memory);
         const statusTimes = data.map(item => item.status);
 

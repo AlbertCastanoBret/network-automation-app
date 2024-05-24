@@ -18,7 +18,7 @@ export const DevicesPage = () => {
         vendor: device.vendor,
         os: device.os,
         osVersion: device.os_version ?? 'N/A',
-        cpu: device.cpu * 100 ?? 'N/A',
+        cpu: device.cpu ?? 'N/A',
         memory: device.memory_percentage ?? 'N/A',
         responseTime: device.response_time ?? '0',
         lastChecked: device.last_checked

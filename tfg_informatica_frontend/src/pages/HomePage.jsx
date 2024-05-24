@@ -118,7 +118,7 @@ export const HomePage = () => {
 
   const prepareBarChartData = (data) => {
     const totalDevices = data.length;
-    const avgCpu = data.reduce((acc, status) => acc + status.cpu, 0) / totalDevices * 100;
+    const avgCpu = data.reduce((acc, status) => acc + status.cpu, 0) / totalDevices;
     const avgMemory = data.reduce((acc, status) => acc + status.memory, 0) / totalDevices;
 
     setCpuMemoryData({
